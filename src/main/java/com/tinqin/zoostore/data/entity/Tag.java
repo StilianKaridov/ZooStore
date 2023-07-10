@@ -28,6 +28,9 @@ public class Tag {
     @Column(nullable = false, unique = true)
     private String title;
 
+    @Column(name = "is_archived")
+    private Boolean isArchived;
+
     @ManyToMany
     private Set<Item> items;
 }
