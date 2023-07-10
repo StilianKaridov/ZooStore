@@ -34,6 +34,7 @@ public class TagServiceImpl implements TagService {
 
         Tag tagEntity = new Tag();
         tagEntity.setTitle(title);
+        tagEntity.setIsArchived(Boolean.FALSE);
 
         this.tagRepository.save(tagEntity);
 
@@ -67,6 +68,36 @@ public class TagServiceImpl implements TagService {
                 builder().
                 title(newTitle).
                 build();
+    }
+
+    @Override
+    public boolean archiveTag(String title) {
+        Tag tag = this.tagRepository.findTagByTitle(title).orElseThrow(NoSuchTagException::new);
+
+        if (tag.getIsArchived()) {
+            return false;
+        }
+
+        tag.setIsArchived(Boolean.TRUE);
+
+        this.tagRepository.save(tag);
+
+        return true;
+    }
+
+    @Override
+    public boolean unarchiveTag(String title) {
+        Tag tag = this.tagRepository.findTagByTitle(title).orElseThrow(NoSuchTagException::new);
+
+        if (!tag.getIsArchived()) {
+            return false;
+        }
+
+        tag.setIsArchived(Boolean.FALSE);
+
+        this.tagRepository.save(tag);
+
+        return true;
     }
 
     private boolean checkIfTitleExists(String title) {

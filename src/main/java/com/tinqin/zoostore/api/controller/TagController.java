@@ -7,12 +7,15 @@ import com.tinqin.zoostore.api.response.TagUpdateResponse;
 import com.tinqin.zoostore.exception.NoSuchTagException;
 import com.tinqin.zoostore.exception.NullOrEmptyTitleException;
 import com.tinqin.zoostore.exception.OccupiedTagTitleException;
+import com.tinqin.zoostore.exception.TagAlreadyArchivedException;
+import com.tinqin.zoostore.exception.TagAlreadyUnarchivedException;
 import com.tinqin.zoostore.service.TagService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -22,6 +25,8 @@ public class TagController {
 
     private static final String SUCCESSFULLY_CREATED_TAG_RESP_MESSAGE = "Successfully created Tag with title %s";
     private static final String SUCCESSFULLY_UPDATED_TAG_RESP_MESSAGE = "Successfully updated Tag title from %s to %s";
+    private static final String SUCCESSFULLY_ARCHIVED_TAG_RESP_MESSAGE = "Successfully archived tag with title %s";
+    private static final String SUCCESSFULLY_UNARCHIVED_TAG_RESP_MESSAGE = "Successfully unarchived tag with title %s";
 
     private final TagService tagService;
 
@@ -64,6 +69,28 @@ public class TagController {
         );
     }
 
+    @PatchMapping("/archiveTag/{title}")
+    public ResponseEntity<String> archiveTag(@PathVariable String title) {
+        if (!this.tagService.archiveTag(title)) {
+            throw new TagAlreadyArchivedException();
+        }
+
+        return ResponseEntity.ok(
+                String.format(SUCCESSFULLY_ARCHIVED_TAG_RESP_MESSAGE, title)
+        );
+    }
+
+    @PatchMapping("/unarchiveTag/{title}")
+    public ResponseEntity<String> unarchiveTag(@PathVariable String title) {
+        if (!this.tagService.unarchiveTag(title)) {
+            throw new TagAlreadyUnarchivedException();
+        }
+
+        return ResponseEntity.ok(
+                String.format(SUCCESSFULLY_UNARCHIVED_TAG_RESP_MESSAGE, title)
+        );
+    }
+
     private boolean checkIfTitleIsNullOrEmpty(String title) {
         return title == null || title.trim().equals("");
     }
@@ -81,5 +108,15 @@ public class TagController {
     @ExceptionHandler(value = NoSuchTagException.class)
     public ResponseEntity<String> handleNoSuchTagException(NoSuchTagException ex) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+    }
+
+    @ExceptionHandler(value = TagAlreadyArchivedException.class)
+    public ResponseEntity<String> handleTagAlreadyArchivedException(TagAlreadyArchivedException ex) {
+        return ResponseEntity.badRequest().body(ex.getMessage());
+    }
+
+    @ExceptionHandler(value = TagAlreadyUnarchivedException.class)
+    public ResponseEntity<String> handleTagAlreadyUnarchivedException(TagAlreadyUnarchivedException ex) {
+        return ResponseEntity.badRequest().body(ex.getMessage());
     }
 }

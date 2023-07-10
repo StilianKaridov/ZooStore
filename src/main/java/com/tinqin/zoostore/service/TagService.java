@@ -10,4 +10,8 @@ public interface TagService {
     TagCreateResponse createTag(TagCreateRequest tagCreateRequest);
 
     TagUpdateResponse updateTag(TagUpdateRequest tagUpdateRequest);
+
+    boolean archiveTag(String title);
+
+    boolean unarchiveTag(String title);
 }
