@@ -3,7 +3,7 @@ package com.tinqin.zoostore.service.impl;
 import com.tinqin.zoostore.api.request.TagCreateRequest;
 import com.tinqin.zoostore.api.request.TagUpdateRequest;
 import com.tinqin.zoostore.api.response.TagCreateResponse;
-import com.tinqin.zoostore.api.response.UpdateTagResponse;
+import com.tinqin.zoostore.api.response.TagUpdateResponse;
 import com.tinqin.zoostore.data.entity.Tag;
 import com.tinqin.zoostore.data.repository.TagRepository;
 import com.tinqin.zoostore.exception.NoSuchTagException;
@@ -44,7 +44,7 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
-    public UpdateTagResponse updateTag(TagUpdateRequest tagUpdateRequest) {
+    public TagUpdateResponse updateTag(TagUpdateRequest tagUpdateRequest) {
         String oldTitle = tagUpdateRequest.getOldTitle();
         String newTitle = tagUpdateRequest.getNewTitle();
 
@@ -63,7 +63,7 @@ public class TagServiceImpl implements TagService {
 
         this.tagRepository.save(updated);
 
-        return UpdateTagResponse.
+        return TagUpdateResponse.
                 builder().
                 title(newTitle).
                 build();
