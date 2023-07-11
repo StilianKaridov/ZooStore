@@ -1,8 +1,10 @@
 package com.tinqin.zoostore.service;
 
 import com.tinqin.zoostore.api.request.VendorCreateRequest;
+import com.tinqin.zoostore.api.response.VendorArchiveResponse;
 import com.tinqin.zoostore.api.response.VendorCreateResponse;
 import com.tinqin.zoostore.api.response.VendorDeleteResponse;
+import com.tinqin.zoostore.api.response.VendorUnarchiveResponse;
 import com.tinqin.zoostore.api.response.VendorUpdateNameResponse;
 import com.tinqin.zoostore.api.response.VendorUpdatePhoneResponse;
 
@@ -14,9 +16,9 @@ public interface VendorService {
 
     VendorUpdatePhoneResponse updateVendorPhone(String vendorName, String vendorNewPhone);
 
-    boolean archiveVendor(String vendorName);
+    VendorArchiveResponse archiveVendor(String vendorName);
 
-    boolean unarchiveVendor(String vendorName);
+    VendorUnarchiveResponse unarchiveVendor(String vendorName);
 
     VendorDeleteResponse deleteVendor(String vendorName);
 }

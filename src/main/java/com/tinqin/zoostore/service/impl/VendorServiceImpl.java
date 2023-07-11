@@ -1,14 +1,18 @@
 package com.tinqin.zoostore.service.impl;
 
 import com.tinqin.zoostore.api.request.VendorCreateRequest;
+import com.tinqin.zoostore.api.response.VendorArchiveResponse;
 import com.tinqin.zoostore.api.response.VendorCreateResponse;
 import com.tinqin.zoostore.api.response.VendorDeleteResponse;
+import com.tinqin.zoostore.api.response.VendorUnarchiveResponse;
 import com.tinqin.zoostore.api.response.VendorUpdateNameResponse;
 import com.tinqin.zoostore.api.response.VendorUpdatePhoneResponse;
 import com.tinqin.zoostore.data.entity.Vendor;
 import com.tinqin.zoostore.data.repository.VendorRepository;
 import com.tinqin.zoostore.exception.NoSuchVendorException;
+import com.tinqin.zoostore.exception.VendorAlreadyArchivedException;
 import com.tinqin.zoostore.exception.VendorAlreadyExistingException;
+import com.tinqin.zoostore.exception.VendorAlreadyUnarchivedException;
 import com.tinqin.zoostore.exception.VendorArchivedException;
 import com.tinqin.zoostore.service.VendorService;
 import org.modelmapper.ModelMapper;
@@ -43,6 +47,7 @@ public class VendorServiceImpl implements VendorService {
         Vendor vendor = new Vendor();
         vendor.setName(vendorName);
         vendor.setPhoneNumber(phoneNumber);
+        vendor.setIsArchived(Boolean.FALSE);
 
         this.vendorRepository.save(vendor);
 
@@ -51,11 +56,9 @@ public class VendorServiceImpl implements VendorService {
 
     @Override
     public VendorUpdateNameResponse updateVendorName(String vendorName, String vendorNewName) {
-        Optional<Vendor> vendorOpt = this.vendorRepository.findFirstByName(vendorName);
-
-        if (vendorOpt.isEmpty()) {
-            throw new NoSuchVendorException();
-        }
+        Vendor vendor = this.vendorRepository.
+                findFirstByName(vendorName)
+                .orElseThrow(NoSuchVendorException::new);
 
         Optional<Vendor> checkIfNewNameExist = this.vendorRepository.findFirstByName(vendorNewName);
 
@@ -63,25 +66,18 @@ public class VendorServiceImpl implements VendorService {
             throw new VendorAlreadyExistingException();
         }
 
-        Vendor vendorEntity = vendorOpt.get();
-        vendorEntity.setName(vendorNewName);
+        vendor.setName(vendorNewName);
 
-        this.vendorRepository.save(vendorEntity);
+        this.vendorRepository.save(vendor);
 
-        return VendorUpdateNameResponse.
-                builder().
-                oldName(vendorName).
-                newName(vendorNewName).
-                build();
+        return this.modelMapper.map(vendor, VendorUpdateNameResponse.class);
     }
 
     @Override
     public VendorUpdatePhoneResponse updateVendorPhone(String vendorPhone, String vendorNewPhone) {
-        Optional<Vendor> vendorOpt = this.vendorRepository.findFirstByPhoneNumber(vendorPhone);
-
-        if (vendorOpt.isEmpty()) {
-            throw new NoSuchVendorException();
-        }
+        Vendor vendor = this.vendorRepository.
+                findFirstByPhoneNumber(vendorPhone)
+                .orElseThrow(NoSuchVendorException::new);
 
         Optional<Vendor> checkIfNewPhoneExist = this.vendorRepository.findFirstByPhoneNumber(vendorNewPhone);
 
@@ -89,66 +85,59 @@ public class VendorServiceImpl implements VendorService {
             throw new VendorAlreadyExistingException();
         }
 
-        Vendor vendorEntity = vendorOpt.get();
+        vendor.setPhoneNumber(vendorNewPhone);
 
-        String vendorOldPhone = vendorEntity.getPhoneNumber();
+        this.vendorRepository.save(vendor);
 
-        vendorEntity.setPhoneNumber(vendorNewPhone);
-
-        this.vendorRepository.save(vendorEntity);
-
-        return VendorUpdatePhoneResponse.
-                builder().
-                name(vendorOldPhone).
-                oldPhone(vendorOldPhone).
-                newPhone(vendorNewPhone).
-                build();
+        return this.modelMapper.map(vendor, VendorUpdatePhoneResponse.class);
     }
 
     @Override
-    public boolean archiveVendor(String vendorName) {
-        Vendor vendor = this.vendorRepository.findFirstByName(vendorName).orElseThrow(NoSuchVendorException::new);
+    public VendorArchiveResponse archiveVendor(String vendorName) {
+        Vendor vendor = this.vendorRepository.
+                findFirstByName(vendorName).
+                orElseThrow(NoSuchVendorException::new);
 
         if (vendor.getIsArchived()) {
-            return false;
+            throw new VendorAlreadyArchivedException();
         }
 
         vendor.setIsArchived(Boolean.TRUE);
 
         this.vendorRepository.save(vendor);
 
-        return true;
+        return this.modelMapper.map(vendor, VendorArchiveResponse.class);
     }
 
     @Override
-    public boolean unarchiveVendor(String vendorName) {
-        Vendor vendor = this.vendorRepository.findFirstByName(vendorName).orElseThrow(NoSuchVendorException::new);
+    public VendorUnarchiveResponse unarchiveVendor(String vendorName) {
+        Vendor vendor = this.vendorRepository.
+                findFirstByName(vendorName).
+                orElseThrow(NoSuchVendorException::new);
 
         if (!vendor.getIsArchived()) {
-            return false;
+            throw new VendorAlreadyUnarchivedException();
         }
 
         vendor.setIsArchived(Boolean.FALSE);
 
         this.vendorRepository.save(vendor);
 
-        return true;
+        return this.modelMapper.map(vendor, VendorUnarchiveResponse.class);
     }
 
     @Override
     public VendorDeleteResponse deleteVendor(String vendorName) {
-        Optional<Vendor> vendorOpt = this.vendorRepository.findFirstByName(vendorName);
+        Vendor vendor = this.vendorRepository.
+                findFirstByName(vendorName)
+                .orElseThrow(NoSuchVendorException::new);
 
-        if (vendorOpt.isEmpty()) {
-            throw new NoSuchVendorException();
-        }
-
-        if (vendorOpt.get().getIsArchived()) {
+        if (vendor.getIsArchived()) {
             throw new VendorArchivedException();
         }
 
-        this.vendorRepository.delete(vendorOpt.get());
+        this.vendorRepository.delete(vendor);
 
-        return this.modelMapper.map(vendorOpt.get(), VendorDeleteResponse.class);
+        return this.modelMapper.map(vendor, VendorDeleteResponse.class);
     }
 }

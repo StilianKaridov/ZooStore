@@ -2,12 +2,16 @@ package com.tinqin.zoostore.service.impl;
 
 import com.tinqin.zoostore.api.request.TagCreateRequest;
 import com.tinqin.zoostore.api.request.TagUpdateRequest;
+import com.tinqin.zoostore.api.response.TagArchiveResponse;
 import com.tinqin.zoostore.api.response.TagCreateResponse;
+import com.tinqin.zoostore.api.response.TagUnarchiveResponse;
 import com.tinqin.zoostore.api.response.TagUpdateResponse;
 import com.tinqin.zoostore.data.entity.Tag;
 import com.tinqin.zoostore.data.repository.TagRepository;
 import com.tinqin.zoostore.exception.NoSuchTagException;
 import com.tinqin.zoostore.exception.OccupiedTagTitleException;
+import com.tinqin.zoostore.exception.TagAlreadyArchivedException;
+import com.tinqin.zoostore.exception.TagAlreadyUnarchivedException;
 import com.tinqin.zoostore.service.TagService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -68,33 +72,37 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
-    public boolean archiveTag(String title) {
-        Tag tag = this.tagRepository.findTagByTitle(title).orElseThrow(NoSuchTagException::new);
+    public TagArchiveResponse archiveTag(String title) {
+        Tag tag = this.tagRepository.
+                findTagByTitle(title).
+                orElseThrow(NoSuchTagException::new);
 
         if (tag.getIsArchived()) {
-            return false;
+            throw new TagAlreadyArchivedException();
         }
 
         tag.setIsArchived(Boolean.TRUE);
 
         this.tagRepository.save(tag);
 
-        return true;
+        return this.modelMapper.map(tag, TagArchiveResponse.class);
     }
 
     @Override
-    public boolean unarchiveTag(String title) {
-        Tag tag = this.tagRepository.findTagByTitle(title).orElseThrow(NoSuchTagException::new);
+    public TagUnarchiveResponse unarchiveTag(String title) {
+        Tag tag = this.tagRepository.
+                findTagByTitle(title).
+                orElseThrow(NoSuchTagException::new);
 
         if (!tag.getIsArchived()) {
-            return false;
+            throw new TagAlreadyUnarchivedException();
         }
 
         tag.setIsArchived(Boolean.FALSE);
 
         this.tagRepository.save(tag);
 
-        return true;
+        return this.modelMapper.map(tag, TagUnarchiveResponse.class);
     }
 
     private boolean checkIfTitleExists(String title) {

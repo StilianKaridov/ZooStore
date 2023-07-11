@@ -1,17 +1,14 @@
 package com.tinqin.zoostore.api.request;
 
-import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
 @AllArgsConstructor
 @Getter
-@Setter(AccessLevel.PRIVATE)
-@Builder
+@Setter
 public class VendorUpdatePhoneRequest {
 
     private String oldPhone;

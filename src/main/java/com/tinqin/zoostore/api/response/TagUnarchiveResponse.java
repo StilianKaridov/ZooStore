@@ -11,11 +11,11 @@ import java.util.UUID;
 @AllArgsConstructor
 @Getter
 @Setter
-public class VendorUpdateNameResponse {
+public class TagUnarchiveResponse {
 
     private UUID id;
 
-    private String name;
+    private String title;
 
-    private String phoneNumber;
+    private Boolean isArchived;
 }

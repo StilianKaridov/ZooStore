@@ -1,18 +1,19 @@
 package com.tinqin.zoostore.api.response;
 
-import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+import java.util.UUID;
+
+@NoArgsConstructor
 @AllArgsConstructor
 @Getter
-@Setter(AccessLevel.PRIVATE)
-@Builder
+@Setter
 public class TagUpdateResponse {
+
+    private UUID id;
 
     private String title;
 }

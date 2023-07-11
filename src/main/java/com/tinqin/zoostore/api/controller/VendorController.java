@@ -3,8 +3,10 @@ package com.tinqin.zoostore.api.controller;
 import com.tinqin.zoostore.api.request.VendorCreateRequest;
 import com.tinqin.zoostore.api.request.VendorUpdateNameRequest;
 import com.tinqin.zoostore.api.request.VendorUpdatePhoneRequest;
+import com.tinqin.zoostore.api.response.VendorArchiveResponse;
 import com.tinqin.zoostore.api.response.VendorCreateResponse;
 import com.tinqin.zoostore.api.response.VendorDeleteResponse;
+import com.tinqin.zoostore.api.response.VendorUnarchiveResponse;
 import com.tinqin.zoostore.api.response.VendorUpdateNameResponse;
 import com.tinqin.zoostore.api.response.VendorUpdatePhoneResponse;
 import com.tinqin.zoostore.exception.NoSuchVendorException;
@@ -25,14 +27,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Optional;
-
 @RestController
 public class VendorController {
-
-    private static final String SUCCESSFULLY_CREATED_VENDOR_MESSAGE = "Successfully created Vendor with name: %s and phoneNumber: %s";
-    private static final String SUCCESSFULLY_ARCHIVED_VENDOR_MESSAGE = "Successfully archived vendor with name %s";
-    private static final String SUCCESSFULLY_UNARCHIVED_VENDOR_MESSAGE = "Successfully unarchived vendor with name %s";
 
     private final VendorService vendorService;
 
@@ -42,7 +38,9 @@ public class VendorController {
     }
 
     @PostMapping("/createVendor")
-    public ResponseEntity<String> createVendor(@RequestBody VendorCreateRequest vendorCreateRequest) {
+    public ResponseEntity<VendorCreateResponse> createVendor(
+            @RequestBody VendorCreateRequest vendorCreateRequest
+    ) {
         String name = vendorCreateRequest.getName();
         String phoneNumber = vendorCreateRequest.getPhoneNumber();
 
@@ -50,21 +48,15 @@ public class VendorController {
             throw new NullOrEmptyStringException();
         }
 
-        VendorCreateResponse vendor = this.vendorService.createVendor(vendorCreateRequest);
+        VendorCreateResponse vendorResponse = this.vendorService.createVendor(vendorCreateRequest);
 
         return ResponseEntity.
                 status(201).
-                body(
-                        String.format(
-                                SUCCESSFULLY_CREATED_VENDOR_MESSAGE,
-                                vendor.getName(),
-                                vendor.getPhoneNumber()
-                        )
-                );
+                body(vendorResponse);
     }
 
     @PatchMapping("/updateVendorName")
-    public ResponseEntity<String> updateVendorName(
+    public ResponseEntity<VendorUpdateNameResponse> updateVendorName(
             @RequestBody VendorUpdateNameRequest vendorUpdateRequest
     ) {
         String vendorOldName = vendorUpdateRequest.getOldName();
@@ -75,25 +67,14 @@ public class VendorController {
             throw new NullOrEmptyStringException();
         }
 
-        StringBuilder response = new StringBuilder();
-
-        VendorUpdateNameResponse vendorWithUpdatedName = this.vendorService.
+        VendorUpdateNameResponse updatedVendor = this.vendorService.
                 updateVendorName(vendorOldName, vendorNewName);
 
-        response.append(String.format(
-                        "Successfully updated vendor's name from %s to %s.",
-                        vendorWithUpdatedName.getOldName(),
-                        vendorWithUpdatedName.getNewName()
-                )
-        );
-
-        return ResponseEntity.
-                status(200).
-                body(response.toString());
+        return ResponseEntity.ok(updatedVendor);
     }
 
     @PatchMapping("/updateVendorPhone")
-    public ResponseEntity<String> updateVendorPhone(
+    public ResponseEntity<VendorUpdatePhoneResponse> updateVendorPhone(
             @RequestBody VendorUpdatePhoneRequest vendorUpdatePhoneRequest
     ) {
         String vendorOldPhone = vendorUpdatePhoneRequest.getOldPhone();
@@ -104,51 +85,32 @@ public class VendorController {
             throw new NullOrEmptyStringException();
         }
 
-        StringBuilder response = new StringBuilder();
-
-        VendorUpdatePhoneResponse vendorWithUpdatedPhone = this.vendorService.
+        VendorUpdatePhoneResponse updatedVendor = this.vendorService.
                 updateVendorPhone(vendorOldPhone, vendorNewPhone);
 
-        response.append(String.format(
-                        "Successfully updated vendor's phone from %s to %s.",
-                        vendorWithUpdatedPhone.getOldPhone(),
-                        vendorWithUpdatedPhone.getNewPhone()
-                )
-        );
-
-        return ResponseEntity.
-                status(200).
-                body(response.toString());
+        return ResponseEntity.ok(updatedVendor);
     }
 
     @PatchMapping("/archiveVendor/{vendorName}")
-    public ResponseEntity<String> archiveVendor(@PathVariable String vendorName) {
-        if (!this.vendorService.archiveVendor(vendorName)) {
-            throw new VendorAlreadyArchivedException();
-        }
+    public ResponseEntity<VendorArchiveResponse> archiveVendor(@PathVariable String vendorName) {
+        VendorArchiveResponse archivedVendor = this.vendorService.archiveVendor(vendorName);
 
-        return ResponseEntity.ok(
-                String.format(SUCCESSFULLY_ARCHIVED_VENDOR_MESSAGE, vendorName)
-        );
+        return ResponseEntity.ok(archivedVendor);
     }
 
     @PatchMapping("/unarchiveVendor/{vendorName}")
-    public ResponseEntity<String> unarchiveVendor(@PathVariable String vendorName) {
-        if (!this.vendorService.unarchiveVendor(vendorName)) {
-            throw new VendorAlreadyUnarchivedException();
-        }
+    public ResponseEntity<VendorUnarchiveResponse> unarchiveVendor(@PathVariable String vendorName) {
+        VendorUnarchiveResponse unarchivedVendor = this.vendorService.unarchiveVendor(vendorName);
 
-        return ResponseEntity.ok(
-                String.format(SUCCESSFULLY_UNARCHIVED_VENDOR_MESSAGE, vendorName)
-        );
+        return ResponseEntity.ok(unarchivedVendor);
     }
 
     @Transactional
     @DeleteMapping("/deleteVendor/{vendorName}")
     public ResponseEntity<VendorDeleteResponse> deleteVendor(@PathVariable String vendorName) {
-        VendorDeleteResponse vendor = this.vendorService.deleteVendor(vendorName);
+        VendorDeleteResponse deletedVendor = this.vendorService.deleteVendor(vendorName);
 
-        return ResponseEntity.of(Optional.of(vendor));
+        return ResponseEntity.ok(deletedVendor);
     }
 
     private boolean checkIfStringIsNullOrEmpty(String str) {
@@ -167,7 +129,7 @@ public class VendorController {
 
     @ExceptionHandler(value = NoSuchVendorException.class)
     public ResponseEntity<String> handleNotExistingVendorException(NoSuchVendorException ex) {
-        return ResponseEntity.badRequest().body(ex.getMessage());
+        return ResponseEntity.status(404).body(ex.getMessage());
     }
 
     @ExceptionHandler(value = VendorAlreadyArchivedException.class)

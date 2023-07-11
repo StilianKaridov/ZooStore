@@ -2,7 +2,9 @@ package com.tinqin.zoostore.api.controller;
 
 import com.tinqin.zoostore.api.request.TagCreateRequest;
 import com.tinqin.zoostore.api.request.TagUpdateRequest;
+import com.tinqin.zoostore.api.response.TagArchiveResponse;
 import com.tinqin.zoostore.api.response.TagCreateResponse;
+import com.tinqin.zoostore.api.response.TagUnarchiveResponse;
 import com.tinqin.zoostore.api.response.TagUpdateResponse;
 import com.tinqin.zoostore.exception.NoSuchTagException;
 import com.tinqin.zoostore.exception.NullOrEmptyStringException;
@@ -23,11 +25,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class TagController {
 
-    private static final String SUCCESSFULLY_CREATED_TAG_RESP_MESSAGE = "Successfully created Tag with title %s";
-    private static final String SUCCESSFULLY_UPDATED_TAG_RESP_MESSAGE = "Successfully updated Tag title from %s to %s";
-    private static final String SUCCESSFULLY_ARCHIVED_TAG_RESP_MESSAGE = "Successfully archived tag with title %s";
-    private static final String SUCCESSFULLY_UNARCHIVED_TAG_RESP_MESSAGE = "Successfully unarchived tag with title %s";
-
     private final TagService tagService;
 
     @Autowired
@@ -36,23 +33,20 @@ public class TagController {
     }
 
     @PostMapping("/createTag")
-    public ResponseEntity<String> createTag(@RequestBody TagCreateRequest tagCreateRequest) {
+    public ResponseEntity<TagCreateResponse> createTag(@RequestBody TagCreateRequest tagCreateRequest) {
         if (checkIfTitleIsNullOrEmpty(tagCreateRequest.getTitle())) {
             throw new NullOrEmptyStringException();
         }
 
-        TagCreateResponse tag = this.tagService.createTag(tagCreateRequest);
+        TagCreateResponse tagResponse = this.tagService.createTag(tagCreateRequest);
 
         return ResponseEntity.
                 status(201).
-                body(String.format(
-                                SUCCESSFULLY_CREATED_TAG_RESP_MESSAGE, tag.getTitle()
-                        )
-                );
+                body(tagResponse);
     }
 
     @PatchMapping("/updateTag")
-    public ResponseEntity<String> updateTag(@RequestBody TagUpdateRequest tagUpdateRequest) {
+    public ResponseEntity<TagUpdateResponse> updateTag(@RequestBody TagUpdateRequest tagUpdateRequest) {
         String titleToUpdate = tagUpdateRequest.getOldTitle();
         String newTitle = tagUpdateRequest.getNewTitle();
 
@@ -62,33 +56,21 @@ public class TagController {
 
         TagUpdateResponse updatedTag = this.tagService.updateTag(tagUpdateRequest);
 
-        return ResponseEntity.ok(
-                String.format(
-                        SUCCESSFULLY_UPDATED_TAG_RESP_MESSAGE, titleToUpdate, updatedTag.getTitle()
-                )
-        );
+        return ResponseEntity.ok(updatedTag);
     }
 
     @PatchMapping("/archiveTag/{title}")
-    public ResponseEntity<String> archiveTag(@PathVariable String title) {
-        if (!this.tagService.archiveTag(title)) {
-            throw new TagAlreadyArchivedException();
-        }
+    public ResponseEntity<TagArchiveResponse> archiveTag(@PathVariable String title) {
+        TagArchiveResponse archivedTag = this.tagService.archiveTag(title);
 
-        return ResponseEntity.ok(
-                String.format(SUCCESSFULLY_ARCHIVED_TAG_RESP_MESSAGE, title)
-        );
+        return ResponseEntity.ok(archivedTag);
     }
 
     @PatchMapping("/unarchiveTag/{title}")
-    public ResponseEntity<String> unarchiveTag(@PathVariable String title) {
-        if (!this.tagService.unarchiveTag(title)) {
-            throw new TagAlreadyUnarchivedException();
-        }
+    public ResponseEntity<TagUnarchiveResponse> unarchiveTag(@PathVariable String title) {
+        TagUnarchiveResponse unarchivedTag = this.tagService.unarchiveTag(title);
 
-        return ResponseEntity.ok(
-                String.format(SUCCESSFULLY_UNARCHIVED_TAG_RESP_MESSAGE, title)
-        );
+        return ResponseEntity.ok(unarchivedTag);
     }
 
     private boolean checkIfTitleIsNullOrEmpty(String title) {
