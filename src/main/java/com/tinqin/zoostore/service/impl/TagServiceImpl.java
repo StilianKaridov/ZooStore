@@ -9,6 +9,7 @@ import com.tinqin.zoostore.data.repository.TagRepository;
 import com.tinqin.zoostore.exception.NoSuchTagException;
 import com.tinqin.zoostore.exception.OccupiedTagTitleException;
 import com.tinqin.zoostore.service.TagService;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,10 +19,12 @@ import java.util.Optional;
 public class TagServiceImpl implements TagService {
 
     private final TagRepository tagRepository;
+    private final ModelMapper modelMapper;
 
     @Autowired
-    public TagServiceImpl(TagRepository tagRepository) {
+    public TagServiceImpl(TagRepository tagRepository, ModelMapper modelMapper) {
         this.tagRepository = tagRepository;
+        this.modelMapper = modelMapper;
     }
 
     @Override
@@ -38,10 +41,7 @@ public class TagServiceImpl implements TagService {
 
         this.tagRepository.save(tagEntity);
 
-        return TagCreateResponse.
-                builder().
-                title(title).
-                build();
+        return this.modelMapper.map(tagEntity, TagCreateResponse.class);
     }
 
     @Override
@@ -64,10 +64,7 @@ public class TagServiceImpl implements TagService {
 
         this.tagRepository.save(updated);
 
-        return TagUpdateResponse.
-                builder().
-                title(newTitle).
-                build();
+        return this.modelMapper.map(updated, TagUpdateResponse.class);
     }
 
     @Override
