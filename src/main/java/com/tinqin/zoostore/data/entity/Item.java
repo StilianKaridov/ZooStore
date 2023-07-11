@@ -43,6 +43,6 @@ public class Item {
     @OneToMany
     private Set<Multimedia> multimedia;
 
-    @ManyToMany
+    @ManyToMany(mappedBy = "items")
     private Set<Tag> tags;
 }
