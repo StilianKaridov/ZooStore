@@ -5,7 +5,7 @@ import com.tinqin.zoostore.api.request.TagUpdateRequest;
 import com.tinqin.zoostore.api.response.TagCreateResponse;
 import com.tinqin.zoostore.api.response.TagUpdateResponse;
 import com.tinqin.zoostore.exception.NoSuchTagException;
-import com.tinqin.zoostore.exception.NullOrEmptyTitleException;
+import com.tinqin.zoostore.exception.NullOrEmptyStringException;
 import com.tinqin.zoostore.exception.OccupiedTagTitleException;
 import com.tinqin.zoostore.exception.TagAlreadyArchivedException;
 import com.tinqin.zoostore.exception.TagAlreadyUnarchivedException;
@@ -38,7 +38,7 @@ public class TagController {
     @PostMapping("/createTag")
     public ResponseEntity<String> createTag(@RequestBody TagCreateRequest tagCreateRequest) {
         if (checkIfTitleIsNullOrEmpty(tagCreateRequest.getTitle())) {
-            throw new NullOrEmptyTitleException();
+            throw new NullOrEmptyStringException();
         }
 
         TagCreateResponse tag = this.tagService.createTag(tagCreateRequest);
@@ -57,7 +57,7 @@ public class TagController {
         String newTitle = tagUpdateRequest.getNewTitle();
 
         if (checkIfTitleIsNullOrEmpty(titleToUpdate) || checkIfTitleIsNullOrEmpty(newTitle)) {
-            throw new NullOrEmptyTitleException();
+            throw new NullOrEmptyStringException();
         }
 
         TagUpdateResponse updatedTag = this.tagService.updateTag(tagUpdateRequest);
@@ -95,8 +95,8 @@ public class TagController {
         return title == null || title.trim().equals("");
     }
 
-    @ExceptionHandler(value = NullOrEmptyTitleException.class)
-    public ResponseEntity<String> handleTagTitleNullOrEmptyException(NullOrEmptyTitleException ex) {
+    @ExceptionHandler(value = NullOrEmptyStringException.class)
+    public ResponseEntity<String> handleTagTitleNullOrEmptyException(NullOrEmptyStringException ex) {
         return ResponseEntity.badRequest().body(ex.getMessage());
     }
 
