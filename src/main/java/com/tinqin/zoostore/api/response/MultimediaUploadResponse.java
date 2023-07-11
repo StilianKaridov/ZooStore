@@ -1,4 +1,4 @@
-package com.tinqin.zoostore.api.request;
+package com.tinqin.zoostore.api.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,7 +9,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @Getter
 @Setter
-public class CloudinaryMultimedia {
+public class MultimediaUploadResponse {
 
     private String url;
 
