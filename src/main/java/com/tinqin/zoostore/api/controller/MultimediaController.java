@@ -4,7 +4,7 @@ import com.tinqin.zoostore.api.request.CloudinaryMultimedia;
 import com.tinqin.zoostore.api.request.MultimediaUploadRequest;
 import com.tinqin.zoostore.data.entity.Multimedia;
 import com.tinqin.zoostore.exception.MissingFileException;
-import com.tinqin.zoostore.exception.NullOrEmptyPublicIdException;
+import com.tinqin.zoostore.exception.NullOrEmptyStringException;
 import com.tinqin.zoostore.exception.UnsupportedFileTypeException;
 import com.tinqin.zoostore.service.MultimediaService;
 import jakarta.transaction.Transactional;
@@ -58,7 +58,7 @@ public class MultimediaController {
     @DeleteMapping("/deleteMultimedia")
     public ResponseEntity<String> delete(@RequestParam(name = "public_id") String publicId) {
         if (publicId == null || publicId.trim().equals("")) {
-            throw new NullOrEmptyPublicIdException();
+            throw new NullOrEmptyStringException();
         }
 
         boolean isDeletedFromCloud = this.multimediaService.deleteMultimediaFromCloudinary(publicId);
@@ -102,8 +102,8 @@ public class MultimediaController {
         return ResponseEntity.badRequest().body(ex.getMessage());
     }
 
-    @ExceptionHandler(value = NullOrEmptyPublicIdException.class)
-    public ResponseEntity<String> handleNullOrEmptyPublicIdException(NullOrEmptyPublicIdException ex) {
+    @ExceptionHandler(value = NullOrEmptyStringException.class)
+    public ResponseEntity<String> handleNullOrEmptyPublicIdException(NullOrEmptyStringException ex) {
         return ResponseEntity.badRequest().body(ex.getMessage());
     }
 
