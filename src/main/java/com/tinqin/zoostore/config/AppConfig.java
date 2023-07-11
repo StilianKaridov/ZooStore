@@ -1,6 +1,7 @@
 package com.tinqin.zoostore.config;
 
 import com.cloudinary.Cloudinary;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -30,5 +31,10 @@ public class AppConfig {
                         API_SECRET_LABEL, config.getApiSecret()
                 )
         );
+    }
+
+    @Bean
+    public ModelMapper getModelMapper() {
+        return new ModelMapper();
     }
 }
