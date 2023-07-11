@@ -12,4 +12,8 @@ public interface VendorService {
     VendorUpdateNameResponse updateVendorName(String vendorName, String vendorNewName);
 
     VendorUpdatePhoneResponse updateVendorPhone(String vendorName, String vendorNewPhone);
+
+    boolean archiveVendor(String vendorName);
+
+    boolean unarchiveVendor(String vendorName);
 }

@@ -4,8 +4,10 @@ import com.tinqin.zoostore.api.request.VendorCreateRequest;
 import com.tinqin.zoostore.api.response.VendorCreateResponse;
 import com.tinqin.zoostore.api.response.VendorUpdateNameResponse;
 import com.tinqin.zoostore.api.response.VendorUpdatePhoneResponse;
+import com.tinqin.zoostore.data.entity.Tag;
 import com.tinqin.zoostore.data.entity.Vendor;
 import com.tinqin.zoostore.data.repository.VendorRepository;
+import com.tinqin.zoostore.exception.NoSuchTagException;
 import com.tinqin.zoostore.exception.NoSuchVendorException;
 import com.tinqin.zoostore.exception.VendorAlreadyExistingException;
 import com.tinqin.zoostore.service.VendorService;
@@ -101,5 +103,35 @@ public class VendorServiceImpl implements VendorService {
                 oldPhone(vendorOldPhone).
                 newPhone(vendorNewPhone).
                 build();
+    }
+
+    @Override
+    public boolean archiveVendor(String vendorName) {
+        Vendor vendor = this.vendorRepository.findFirstByName(vendorName).orElseThrow(NoSuchVendorException::new);
+
+        if (vendor.getIsArchived()) {
+            return false;
+        }
+
+        vendor.setIsArchived(Boolean.TRUE);
+
+        this.vendorRepository.save(vendor);
+
+        return true;
+    }
+
+    @Override
+    public boolean unarchiveVendor(String vendorName) {
+        Vendor vendor = this.vendorRepository.findFirstByName(vendorName).orElseThrow(NoSuchVendorException::new);
+
+        if (!vendor.getIsArchived()) {
+            return false;
+        }
+
+        vendor.setIsArchived(Boolean.FALSE);
+
+        this.vendorRepository.save(vendor);
+
+        return true;
     }
 }
