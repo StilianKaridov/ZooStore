@@ -4,18 +4,20 @@ import com.tinqin.zoostore.api.request.VendorCreateRequest;
 import com.tinqin.zoostore.api.request.VendorUpdateNameRequest;
 import com.tinqin.zoostore.api.request.VendorUpdatePhoneRequest;
 import com.tinqin.zoostore.api.response.VendorCreateResponse;
+import com.tinqin.zoostore.api.response.VendorDeleteResponse;
 import com.tinqin.zoostore.api.response.VendorUpdateNameResponse;
 import com.tinqin.zoostore.api.response.VendorUpdatePhoneResponse;
 import com.tinqin.zoostore.exception.NoSuchVendorException;
 import com.tinqin.zoostore.exception.NullOrEmptyStringException;
-import com.tinqin.zoostore.exception.TagAlreadyArchivedException;
-import com.tinqin.zoostore.exception.TagAlreadyUnarchivedException;
 import com.tinqin.zoostore.exception.VendorAlreadyArchivedException;
 import com.tinqin.zoostore.exception.VendorAlreadyExistingException;
 import com.tinqin.zoostore.exception.VendorAlreadyUnarchivedException;
+import com.tinqin.zoostore.exception.VendorArchivedException;
 import com.tinqin.zoostore.service.VendorService;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -23,13 +25,14 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Optional;
+
 @RestController
 public class VendorController {
 
     private static final String SUCCESSFULLY_CREATED_VENDOR_MESSAGE = "Successfully created Vendor with name: %s and phoneNumber: %s";
-
-    private static final String SUCCESSFULLY_ARCHIVED_VENDOR_RESP_MESSAGE = "Successfully archived vendor with name %s";
-    private static final String SUCCESSFULLY_UNARCHIVED_VENDOR_RESP_MESSAGE = "Successfully unarchived vendor with name %s";
+    private static final String SUCCESSFULLY_ARCHIVED_VENDOR_MESSAGE = "Successfully archived vendor with name %s";
+    private static final String SUCCESSFULLY_UNARCHIVED_VENDOR_MESSAGE = "Successfully unarchived vendor with name %s";
 
     private final VendorService vendorService;
 
@@ -119,27 +122,34 @@ public class VendorController {
     }
 
     @PatchMapping("/archiveVendor/{vendorName}")
-    public ResponseEntity<String> archiveTag(@PathVariable String vendorName) {
+    public ResponseEntity<String> archiveVendor(@PathVariable String vendorName) {
         if (!this.vendorService.archiveVendor(vendorName)) {
             throw new VendorAlreadyArchivedException();
         }
 
         return ResponseEntity.ok(
-                String.format(SUCCESSFULLY_ARCHIVED_VENDOR_RESP_MESSAGE, vendorName)
+                String.format(SUCCESSFULLY_ARCHIVED_VENDOR_MESSAGE, vendorName)
         );
     }
 
     @PatchMapping("/unarchiveVendor/{vendorName}")
-    public ResponseEntity<String> unarchiveTag(@PathVariable String vendorName) {
+    public ResponseEntity<String> unarchiveVendor(@PathVariable String vendorName) {
         if (!this.vendorService.unarchiveVendor(vendorName)) {
             throw new VendorAlreadyUnarchivedException();
         }
 
         return ResponseEntity.ok(
-                String.format(SUCCESSFULLY_UNARCHIVED_VENDOR_RESP_MESSAGE, vendorName)
+                String.format(SUCCESSFULLY_UNARCHIVED_VENDOR_MESSAGE, vendorName)
         );
     }
 
+    @Transactional
+    @DeleteMapping("/deleteVendor/{vendorName}")
+    public ResponseEntity<VendorDeleteResponse> deleteVendor(@PathVariable String vendorName) {
+        VendorDeleteResponse vendor = this.vendorService.deleteVendor(vendorName);
+
+        return ResponseEntity.of(Optional.of(vendor));
+    }
 
     private boolean checkIfStringIsNullOrEmpty(String str) {
         return str == null || str.trim().equals("");
@@ -167,6 +177,11 @@ public class VendorController {
 
     @ExceptionHandler(value = VendorAlreadyUnarchivedException.class)
     public ResponseEntity<String> handleVendorAlreadyUnarchivedException(VendorAlreadyUnarchivedException ex) {
+        return ResponseEntity.badRequest().body(ex.getMessage());
+    }
+
+    @ExceptionHandler(value = VendorArchivedException.class)
+    public ResponseEntity<String> handleOnVendorDeleteIsArchivedException(VendorArchivedException ex) {
         return ResponseEntity.badRequest().body(ex.getMessage());
     }
 }

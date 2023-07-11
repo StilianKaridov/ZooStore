@@ -2,14 +2,14 @@ package com.tinqin.zoostore.service.impl;
 
 import com.tinqin.zoostore.api.request.VendorCreateRequest;
 import com.tinqin.zoostore.api.response.VendorCreateResponse;
+import com.tinqin.zoostore.api.response.VendorDeleteResponse;
 import com.tinqin.zoostore.api.response.VendorUpdateNameResponse;
 import com.tinqin.zoostore.api.response.VendorUpdatePhoneResponse;
-import com.tinqin.zoostore.data.entity.Tag;
 import com.tinqin.zoostore.data.entity.Vendor;
 import com.tinqin.zoostore.data.repository.VendorRepository;
-import com.tinqin.zoostore.exception.NoSuchTagException;
 import com.tinqin.zoostore.exception.NoSuchVendorException;
 import com.tinqin.zoostore.exception.VendorAlreadyExistingException;
+import com.tinqin.zoostore.exception.VendorArchivedException;
 import com.tinqin.zoostore.service.VendorService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -133,5 +133,22 @@ public class VendorServiceImpl implements VendorService {
         this.vendorRepository.save(vendor);
 
         return true;
+    }
+
+    @Override
+    public VendorDeleteResponse deleteVendor(String vendorName) {
+        Optional<Vendor> vendorOpt = this.vendorRepository.findFirstByName(vendorName);
+
+        if (vendorOpt.isEmpty()) {
+            throw new NoSuchVendorException();
+        }
+
+        if (vendorOpt.get().getIsArchived()) {
+            throw new VendorArchivedException();
+        }
+
+        this.vendorRepository.delete(vendorOpt.get());
+
+        return this.modelMapper.map(vendorOpt.get(), VendorDeleteResponse.class);
     }
 }
