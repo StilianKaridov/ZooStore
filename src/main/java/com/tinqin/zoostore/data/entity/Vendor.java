@@ -33,6 +33,9 @@ public class Vendor {
     @Column(nullable = false, unique = true)
     private String phoneNumber;
 
+    @Column(name = "is_archived", nullable = false)
+    private Boolean isArchived;
+
     @OneToMany(mappedBy = "vendor")
     private Set<Item> items;
 }
