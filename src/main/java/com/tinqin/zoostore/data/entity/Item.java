@@ -5,6 +5,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
 import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
@@ -37,12 +39,20 @@ public class Item {
     @Column(nullable = false)
     private String description;
 
+    @Column(name = "is_archived", nullable = false)
+    private Boolean isArchived;
+
     @ManyToOne
     private Vendor vendor;
 
     @OneToMany
     private Set<Multimedia> multimedia;
 
-    @ManyToMany(mappedBy = "items")
+    @ManyToMany
+    @JoinTable(
+            name = "items_tags",
+            joinColumns = @JoinColumn(name = "item_id"),
+            inverseJoinColumns = @JoinColumn(name = "tag_id")
+    )
     private Set<Tag> tags;
 }
