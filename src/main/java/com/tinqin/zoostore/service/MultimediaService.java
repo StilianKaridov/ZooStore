@@ -1,18 +1,17 @@
 package com.tinqin.zoostore.service;
 
-import com.tinqin.zoostore.api.request.CloudinaryMultimedia;
-import com.tinqin.zoostore.data.entity.Multimedia;
-import org.springframework.web.multipart.MultipartFile;
+import com.tinqin.zoostore.api.request.MultimediaUploadRequest;
+import com.tinqin.zoostore.api.response.MultimediaDeleteResponse;
+import com.tinqin.zoostore.api.response.MultimediaRetrieveResponse;
+import com.tinqin.zoostore.api.response.MultimediaUploadResponse;
 
 import java.io.IOException;
 
 public interface MultimediaService {
 
-    CloudinaryMultimedia uploadMultimedia(MultipartFile multipartFile) throws IOException;
+    MultimediaRetrieveResponse retrieveMultimedia(String publicId);
 
-    void saveMultimediaToRepository(Multimedia multimedia);
+    MultimediaUploadResponse uploadMultimedia(MultimediaUploadRequest multimedia) throws IOException;
 
-    boolean deleteMultimediaFromRepository(String publicId);
-
-    boolean deleteMultimediaFromCloudinary(String publicId);
+    MultimediaDeleteResponse deleteMultimedia(String publicId);
 }

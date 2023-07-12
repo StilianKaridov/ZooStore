@@ -1,8 +1,11 @@
 package com.tinqin.zoostore.api.controller;
 
 import com.tinqin.zoostore.api.request.MultimediaUploadRequest;
+import com.tinqin.zoostore.api.response.MultimediaDeleteResponse;
+import com.tinqin.zoostore.api.response.MultimediaRetrieveResponse;
 import com.tinqin.zoostore.api.response.MultimediaUploadResponse;
 import com.tinqin.zoostore.exception.MissingFileException;
+import com.tinqin.zoostore.exception.MultimediaDeletionException;
 import com.tinqin.zoostore.exception.NoSuchMultimediaException;
 import com.tinqin.zoostore.exception.NullOrEmptyStringException;
 import com.tinqin.zoostore.exception.UnsupportedFileTypeException;
@@ -13,8 +16,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -30,6 +33,17 @@ public class MultimediaController {
         this.multimediaService = multimediaService;
     }
 
+    @GetMapping("/retrieveMultimedia")
+    public ResponseEntity<MultimediaRetrieveResponse> retrieve(@RequestParam(name = "public_id") String publicId) {
+        if (publicId == null || publicId.trim().equals("")) {
+            throw new NullOrEmptyStringException();
+        }
+
+        MultimediaRetrieveResponse multimedia = this.multimediaService.retrieveMultimedia(publicId);
+
+        return ResponseEntity.ok(multimedia);
+    }
+
     @PostMapping("/uploadMultimedia")
     public ResponseEntity<MultimediaUploadResponse> upload(MultimediaUploadRequest fileUpload) throws IOException {
         if (fileUpload.getFile().isEmpty()) {
@@ -43,27 +57,17 @@ public class MultimediaController {
                 body(response);
     }
 
-//    @Transactional
-//    @DeleteMapping("/deleteMultimedia")
-//    public ResponseEntity<String> delete(@RequestParam(name = "public_id") String publicId) {
-//        if (publicId == null || publicId.trim().equals("")) {
-//            throw new NullOrEmptyStringException();
-//        }
-//
-//        boolean isDeletedFromCloud = this.multimediaService.deleteMultimediaFromCloudinary(publicId);
-//        boolean isDeletedFromRepo = this.multimediaService.deleteMultimediaFromRepository(publicId);
-//
-//        if (isDeletedFromCloud && isDeletedFromRepo) {
-//
-//            return ResponseEntity.ok(SUCCESSFULLY_DELETED_MESSAGE);
-//        }
-//
-//        return ResponseEntity.
-//                status(404).
-//                body(
-//                        String.format(NOT_EXISTING_MULTIMEDIA_MESSAGE, publicId)
-//                );
-//    }
+    @Transactional
+    @DeleteMapping("/deleteMultimedia")
+    public ResponseEntity<MultimediaDeleteResponse> delete(@RequestParam(name = "public_id") String publicId) {
+        if (publicId == null || publicId.trim().equals("")) {
+            throw new NullOrEmptyStringException();
+        }
+
+        MultimediaDeleteResponse deletedMultimedia = this.multimediaService.deleteMultimedia(publicId);
+
+        return ResponseEntity.ok(deletedMultimedia);
+    }
 
     @ExceptionHandler(value = MissingFileException.class)
     public ResponseEntity<String> handleMissingFileException(MissingFileException ex) {
@@ -83,5 +87,10 @@ public class MultimediaController {
     @ExceptionHandler(value = NoSuchMultimediaException.class)
     public ResponseEntity<String> handleNoSuchMultimediaException(NoSuchMultimediaException ex) {
         return ResponseEntity.status(404).body(ex.getMessage());
+    }
+
+    @ExceptionHandler(value = MultimediaDeletionException.class)
+    public ResponseEntity<String> handleMultimediaDeletionException(MultimediaDeletionException ex) {
+        return ResponseEntity.internalServerError().body(ex.getMessage());
     }
 }

@@ -1,10 +1,17 @@
 package com.tinqin.zoostore.service.impl;
 
 import com.cloudinary.Cloudinary;
-import com.tinqin.zoostore.api.request.CloudinaryMultimedia;
+import com.tinqin.zoostore.api.request.MultimediaUploadRequest;
+import com.tinqin.zoostore.api.response.MultimediaDeleteResponse;
+import com.tinqin.zoostore.api.response.MultimediaRetrieveResponse;
+import com.tinqin.zoostore.api.response.MultimediaUploadResponse;
 import com.tinqin.zoostore.data.entity.Multimedia;
 import com.tinqin.zoostore.data.repository.MultimediaRepository;
+import com.tinqin.zoostore.exception.MultimediaDeletionException;
+import com.tinqin.zoostore.exception.NoSuchMultimediaException;
+import com.tinqin.zoostore.exception.UnsupportedFileTypeException;
 import com.tinqin.zoostore.service.MultimediaService;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -31,19 +38,37 @@ public class MultimediaServiceImpl implements MultimediaService {
 
     private final Cloudinary cloudinary;
     private final MultimediaRepository multimediaRepository;
+    private final ModelMapper modelMapper;
 
     @Autowired
-    public MultimediaServiceImpl(Cloudinary cloudinary, MultimediaRepository multimediaRepository) {
+    public MultimediaServiceImpl(Cloudinary cloudinary, MultimediaRepository multimediaRepository, ModelMapper modelMapper) {
         this.cloudinary = cloudinary;
         this.multimediaRepository = multimediaRepository;
+        this.modelMapper = modelMapper;
     }
 
     @Override
-    public CloudinaryMultimedia uploadMultimedia(MultipartFile multipartFile) throws IOException {
-        File tempFile = File.createTempFile(TEMP_FILE_LABEL, multipartFile.getOriginalFilename());
-        multipartFile.transferTo(tempFile);
+    public MultimediaRetrieveResponse retrieveMultimedia(String publicId) {
+        Optional<Multimedia> multimediaOpt = this.multimediaRepository.findByPublicId(publicId);
 
-        CloudinaryMultimedia multimedia = new CloudinaryMultimedia();
+        if(multimediaOpt.isEmpty()){
+            throw new NoSuchMultimediaException();
+        }
+
+        return this.modelMapper.map(multimediaOpt.get(), MultimediaRetrieveResponse.class);
+    }
+
+    @Override
+    public MultimediaUploadResponse uploadMultimedia(MultimediaUploadRequest multimediaUploadRequest) throws IOException {
+        MultipartFile file = multimediaUploadRequest.getFile();
+
+        String fileResourceType = this.getFileResourceType(file);
+
+        File tempFile = File.createTempFile(TEMP_FILE_LABEL, file.getOriginalFilename());
+        file.transferTo(tempFile);
+
+        Multimedia multimedia = new Multimedia();
+        multimedia.setType(fileResourceType);
 
         try {
             @SuppressWarnings("unchecked")
@@ -62,31 +87,17 @@ public class MultimediaServiceImpl implements MultimediaService {
             tempFile.delete();
         }
 
-        return multimedia;
-    }
-
-    @Override
-    public void saveMultimediaToRepository(Multimedia multimedia) {
         this.multimediaRepository.save(multimedia);
+
+        return this.modelMapper.map(multimedia, MultimediaUploadResponse.class);
     }
 
     @Override
-    public boolean deleteMultimediaFromRepository(String publicId) {
-        if (this.multimediaRepository.findByPublicId(publicId).isEmpty()) {
-            return false;
-        }
-
-        this.multimediaRepository.deleteByPublicId(publicId);
-
-        return true;
-    }
-
-    @Override
-    public boolean deleteMultimediaFromCloudinary(String publicId) {
+    public MultimediaDeleteResponse deleteMultimedia(String publicId) {
         Optional<Multimedia> multimediaOpt = this.multimediaRepository.findByPublicId(publicId);
 
         if (multimediaOpt.isEmpty()) {
-            return false;
+            throw new NoSuchMultimediaException();
         }
 
         Map<String, String> params = new HashMap<>();
@@ -95,10 +106,24 @@ public class MultimediaServiceImpl implements MultimediaService {
         try {
             this.cloudinary.uploader().destroy(publicId, params);
         } catch (IOException e) {
-            return false;
+            throw new MultimediaDeletionException();
         }
 
-        return true;
+        this.multimediaRepository.deleteByPublicId(publicId);
+
+        return this.modelMapper.map(multimediaOpt.get(), MultimediaDeleteResponse.class);
     }
 
+    private String getFileResourceType(MultipartFile file) {
+        final String videoLabel = "video";
+        final String imageLabel = "image";
+
+        if (file.getContentType().contains(videoLabel)) {
+            return videoLabel;
+        } else if (file.getContentType().contains(imageLabel)) {
+            return imageLabel;
+        } else {
+            throw new UnsupportedFileTypeException();
+        }
+    }
 }
