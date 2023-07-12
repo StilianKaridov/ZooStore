@@ -1,5 +1,6 @@
-package com.tinqin.zoostore.api.request;
+package com.tinqin.zoostore.api.request.vendor;
 
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -11,7 +12,9 @@ import lombok.Setter;
 @Setter
 public class VendorCreateRequest {
 
+    @NotBlank(message = "The name must not be empty!")
     private String name;
 
+    @NotBlank(message = "The phone number must not be empty!")
     private String phoneNumber;
 }

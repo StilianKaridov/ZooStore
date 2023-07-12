@@ -1,4 +1,4 @@
-package com.tinqin.zoostore.api.request;
+package com.tinqin.zoostore.api.response.vendor;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,9 +9,9 @@ import lombok.Setter;
 @AllArgsConstructor
 @Getter
 @Setter
-public class VendorUpdatePhoneRequest {
+public class VendorDeleteResponse {
 
-    private String oldPhone;
+    private String name;
 
-    private String newPhone;
+    private String phoneNumber;
 }

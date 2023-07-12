@@ -1,4 +1,4 @@
-package com.tinqin.zoostore.api.response;
+package com.tinqin.zoostore.api.response.vendor;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -11,7 +11,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @Getter
 @Setter
-public class VendorUpdateNameResponse {
+public class VendorUpdatePhoneResponse {
 
     private UUID id;
 
