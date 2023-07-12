@@ -1,4 +1,4 @@
-package com.tinqin.zoostore.api.response;
+package com.tinqin.zoostore.api.response.tag;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

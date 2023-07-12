@@ -1,4 +1,4 @@
-package com.tinqin.zoostore.exception;
+package com.tinqin.zoostore.exception.tag;
 
 public class OccupiedTagTitleException extends RuntimeException {
 

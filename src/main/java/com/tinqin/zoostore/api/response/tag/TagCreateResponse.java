@@ -1,4 +1,4 @@
-package com.tinqin.zoostore.api.response;
+package com.tinqin.zoostore.api.response.tag;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -11,11 +11,9 @@ import java.util.UUID;
 @AllArgsConstructor
 @Getter
 @Setter
-public class TagArchiveResponse {
+public class TagCreateResponse {
 
     private UUID id;
 
     private String title;
-
-    private Boolean isArchived;
 }

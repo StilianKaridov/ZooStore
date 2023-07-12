@@ -1,19 +1,17 @@
-package com.tinqin.zoostore.api.response;
+package com.tinqin.zoostore.api.request.tag;
 
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.UUID;
-
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
 @Setter
-public class TagCreateResponse {
+public class TagCreateRequest {
 
-    private UUID id;
-
+    @NotBlank(message = "The title must not be empty!")
     private String title;
 }

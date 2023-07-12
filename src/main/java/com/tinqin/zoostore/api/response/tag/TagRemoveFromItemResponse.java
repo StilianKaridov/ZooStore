@@ -1,15 +1,17 @@
-package com.tinqin.zoostore.api.request;
+package com.tinqin.zoostore.api.response.tag;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.UUID;
+
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
 @Setter
-public class TagCreateRequest {
+public class TagRemoveFromItemResponse {
 
-    private String title;
+    private UUID id;
 }
