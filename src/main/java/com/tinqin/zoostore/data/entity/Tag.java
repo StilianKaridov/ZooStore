@@ -33,11 +33,6 @@ public class Tag {
     @Column(name = "is_archived")
     private Boolean isArchived;
 
-    @ManyToMany
-    @JoinTable(
-            name = "item_tag",
-            joinColumns = @JoinColumn(name = "item_id"),
-            inverseJoinColumns = @JoinColumn(name = "tag_id")
-    )
+    @ManyToMany(mappedBy = "tags")
     private Set<Item> items;
 }
