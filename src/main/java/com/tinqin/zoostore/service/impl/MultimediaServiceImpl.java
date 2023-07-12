@@ -1,15 +1,15 @@
 package com.tinqin.zoostore.service.impl;
 
 import com.cloudinary.Cloudinary;
-import com.tinqin.zoostore.api.request.MultimediaUploadRequest;
-import com.tinqin.zoostore.api.response.MultimediaDeleteResponse;
-import com.tinqin.zoostore.api.response.MultimediaRetrieveResponse;
-import com.tinqin.zoostore.api.response.MultimediaUploadResponse;
+import com.tinqin.zoostore.api.request.multimedia.MultimediaUploadRequest;
+import com.tinqin.zoostore.api.response.multimedia.MultimediaDeleteResponse;
+import com.tinqin.zoostore.api.response.multimedia.MultimediaRetrieveResponse;
+import com.tinqin.zoostore.api.response.multimedia.MultimediaUploadResponse;
 import com.tinqin.zoostore.data.entity.Multimedia;
 import com.tinqin.zoostore.data.repository.MultimediaRepository;
-import com.tinqin.zoostore.exception.MultimediaDeletionException;
-import com.tinqin.zoostore.exception.NoSuchMultimediaException;
-import com.tinqin.zoostore.exception.UnsupportedFileTypeException;
+import com.tinqin.zoostore.exception.multimedia.MultimediaDeletionException;
+import com.tinqin.zoostore.exception.multimedia.NoSuchMultimediaException;
+import com.tinqin.zoostore.exception.multimedia.UnsupportedFileTypeException;
 import com.tinqin.zoostore.service.MultimediaService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;

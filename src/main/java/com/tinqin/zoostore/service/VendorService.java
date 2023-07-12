@@ -1,12 +1,15 @@
 package com.tinqin.zoostore.service;
 
-import com.tinqin.zoostore.api.request.VendorCreateRequest;
-import com.tinqin.zoostore.api.response.VendorArchiveResponse;
-import com.tinqin.zoostore.api.response.VendorCreateResponse;
-import com.tinqin.zoostore.api.response.VendorDeleteResponse;
-import com.tinqin.zoostore.api.response.VendorUnarchiveResponse;
-import com.tinqin.zoostore.api.response.VendorUpdateNameResponse;
-import com.tinqin.zoostore.api.response.VendorUpdatePhoneResponse;
+import com.tinqin.zoostore.api.request.vendor.VendorCreateRequest;
+import com.tinqin.zoostore.api.response.vendor.VendorArchiveResponse;
+import com.tinqin.zoostore.api.response.vendor.VendorCreateResponse;
+import com.tinqin.zoostore.api.response.vendor.VendorDeleteResponse;
+import com.tinqin.zoostore.api.response.vendor.VendorUnarchiveResponse;
+import com.tinqin.zoostore.api.response.vendor.VendorUpdateNameResponse;
+import com.tinqin.zoostore.api.response.vendor.VendorUpdatePhoneResponse;
+import com.tinqin.zoostore.data.entity.Vendor;
+
+import java.util.UUID;
 
 public interface VendorService {
 
@@ -21,4 +24,6 @@ public interface VendorService {
     VendorUnarchiveResponse unarchiveVendor(String vendorName);
 
     VendorDeleteResponse deleteVendor(String vendorName);
+
+    Vendor getVendorById(UUID id);
 }

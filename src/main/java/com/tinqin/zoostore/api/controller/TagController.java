@@ -1,20 +1,22 @@
 package com.tinqin.zoostore.api.controller;
 
-import com.tinqin.zoostore.api.request.TagCreateRequest;
-import com.tinqin.zoostore.api.request.TagUpdateRequest;
-import com.tinqin.zoostore.api.response.TagArchiveResponse;
-import com.tinqin.zoostore.api.response.TagCreateResponse;
-import com.tinqin.zoostore.api.response.TagUnarchiveResponse;
-import com.tinqin.zoostore.api.response.TagUpdateResponse;
-import com.tinqin.zoostore.exception.NoSuchTagException;
-import com.tinqin.zoostore.exception.NullOrEmptyStringException;
-import com.tinqin.zoostore.exception.OccupiedTagTitleException;
-import com.tinqin.zoostore.exception.TagAlreadyArchivedException;
-import com.tinqin.zoostore.exception.TagAlreadyUnarchivedException;
+import com.tinqin.zoostore.api.request.tag.TagCreateRequest;
+import com.tinqin.zoostore.api.request.tag.TagUpdateRequest;
+import com.tinqin.zoostore.api.response.tag.TagArchiveResponse;
+import com.tinqin.zoostore.api.response.tag.TagCreateResponse;
+import com.tinqin.zoostore.api.response.tag.TagUnarchiveResponse;
+import com.tinqin.zoostore.api.response.tag.TagUpdateResponse;
+import com.tinqin.zoostore.exception.tag.NoSuchTagException;
+import com.tinqin.zoostore.exception.tag.OccupiedTagTitleException;
+import com.tinqin.zoostore.exception.tag.TagAlreadyArchivedException;
+import com.tinqin.zoostore.exception.tag.TagAlreadyUnarchivedException;
 import com.tinqin.zoostore.service.TagService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -33,11 +35,8 @@ public class TagController {
     }
 
     @PostMapping("/createTag")
-    public ResponseEntity<TagCreateResponse> createTag(@RequestBody TagCreateRequest tagCreateRequest) {
-        if (checkIfTitleIsNullOrEmpty(tagCreateRequest.getTitle())) {
-            throw new NullOrEmptyStringException();
-        }
-
+    public ResponseEntity<TagCreateResponse> createTag(
+            @Valid @RequestBody TagCreateRequest tagCreateRequest) {
         TagCreateResponse tagResponse = this.tagService.createTag(tagCreateRequest);
 
         return ResponseEntity.
@@ -46,14 +45,8 @@ public class TagController {
     }
 
     @PatchMapping("/updateTag")
-    public ResponseEntity<TagUpdateResponse> updateTag(@RequestBody TagUpdateRequest tagUpdateRequest) {
-        String titleToUpdate = tagUpdateRequest.getOldTitle();
-        String newTitle = tagUpdateRequest.getNewTitle();
-
-        if (checkIfTitleIsNullOrEmpty(titleToUpdate) || checkIfTitleIsNullOrEmpty(newTitle)) {
-            throw new NullOrEmptyStringException();
-        }
-
+    public ResponseEntity<TagUpdateResponse> updateTag(
+            @Valid @RequestBody TagUpdateRequest tagUpdateRequest) {
         TagUpdateResponse updatedTag = this.tagService.updateTag(tagUpdateRequest);
 
         return ResponseEntity.ok(updatedTag);
@@ -73,13 +66,15 @@ public class TagController {
         return ResponseEntity.ok(unarchivedTag);
     }
 
-    private boolean checkIfTitleIsNullOrEmpty(String title) {
-        return title == null || title.trim().equals("");
-    }
+    @ExceptionHandler(value = MethodArgumentNotValidException.class)
+    public ResponseEntity<String> handleNullOrEmptyFieldException(MethodArgumentNotValidException ex) {
+        StringBuilder sb = new StringBuilder();
 
-    @ExceptionHandler(value = NullOrEmptyStringException.class)
-    public ResponseEntity<String> handleTagTitleNullOrEmptyException(NullOrEmptyStringException ex) {
-        return ResponseEntity.badRequest().body(ex.getMessage());
+        for (FieldError fieldError : ex.getBindingResult().getFieldErrors()) {
+            sb.append(fieldError.getDefaultMessage()).append("\n");
+        }
+
+        return ResponseEntity.badRequest().body(sb.toString());
     }
 
     @ExceptionHandler(value = OccupiedTagTitleException.class)

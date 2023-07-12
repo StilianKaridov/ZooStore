@@ -1,9 +1,9 @@
 package com.tinqin.zoostore.service;
 
-import com.tinqin.zoostore.api.request.MultimediaUploadRequest;
-import com.tinqin.zoostore.api.response.MultimediaDeleteResponse;
-import com.tinqin.zoostore.api.response.MultimediaRetrieveResponse;
-import com.tinqin.zoostore.api.response.MultimediaUploadResponse;
+import com.tinqin.zoostore.api.request.multimedia.MultimediaUploadRequest;
+import com.tinqin.zoostore.api.response.multimedia.MultimediaDeleteResponse;
+import com.tinqin.zoostore.api.response.multimedia.MultimediaRetrieveResponse;
+import com.tinqin.zoostore.api.response.multimedia.MultimediaUploadResponse;
 
 import java.io.IOException;
 

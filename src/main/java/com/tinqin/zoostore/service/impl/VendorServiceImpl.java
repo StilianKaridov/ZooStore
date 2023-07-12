@@ -1,25 +1,26 @@
 package com.tinqin.zoostore.service.impl;
 
-import com.tinqin.zoostore.api.request.VendorCreateRequest;
-import com.tinqin.zoostore.api.response.VendorArchiveResponse;
-import com.tinqin.zoostore.api.response.VendorCreateResponse;
-import com.tinqin.zoostore.api.response.VendorDeleteResponse;
-import com.tinqin.zoostore.api.response.VendorUnarchiveResponse;
-import com.tinqin.zoostore.api.response.VendorUpdateNameResponse;
-import com.tinqin.zoostore.api.response.VendorUpdatePhoneResponse;
+import com.tinqin.zoostore.api.request.vendor.VendorCreateRequest;
+import com.tinqin.zoostore.api.response.vendor.VendorArchiveResponse;
+import com.tinqin.zoostore.api.response.vendor.VendorCreateResponse;
+import com.tinqin.zoostore.api.response.vendor.VendorDeleteResponse;
+import com.tinqin.zoostore.api.response.vendor.VendorUnarchiveResponse;
+import com.tinqin.zoostore.api.response.vendor.VendorUpdateNameResponse;
+import com.tinqin.zoostore.api.response.vendor.VendorUpdatePhoneResponse;
 import com.tinqin.zoostore.data.entity.Vendor;
 import com.tinqin.zoostore.data.repository.VendorRepository;
-import com.tinqin.zoostore.exception.NoSuchVendorException;
-import com.tinqin.zoostore.exception.VendorAlreadyArchivedException;
-import com.tinqin.zoostore.exception.VendorAlreadyExistingException;
-import com.tinqin.zoostore.exception.VendorAlreadyUnarchivedException;
-import com.tinqin.zoostore.exception.VendorArchivedException;
+import com.tinqin.zoostore.exception.vendor.NoSuchVendorException;
+import com.tinqin.zoostore.exception.vendor.VendorAlreadyArchivedException;
+import com.tinqin.zoostore.exception.vendor.VendorAlreadyExistingException;
+import com.tinqin.zoostore.exception.vendor.VendorAlreadyUnarchivedException;
+import com.tinqin.zoostore.exception.vendor.VendorArchivedException;
 import com.tinqin.zoostore.service.VendorService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class VendorServiceImpl implements VendorService {
@@ -139,5 +140,10 @@ public class VendorServiceImpl implements VendorService {
         this.vendorRepository.delete(vendor);
 
         return this.modelMapper.map(vendor, VendorDeleteResponse.class);
+    }
+
+    @Override
+    public Vendor getVendorById(UUID id) {
+        return this.vendorRepository.findById(id).orElseThrow(NoSuchVendorException::new);
     }
 }

@@ -1,24 +1,27 @@
 package com.tinqin.zoostore.api.controller;
 
-import com.tinqin.zoostore.api.request.MultimediaUploadRequest;
-import com.tinqin.zoostore.api.response.MultimediaDeleteResponse;
-import com.tinqin.zoostore.api.response.MultimediaRetrieveResponse;
-import com.tinqin.zoostore.api.response.MultimediaUploadResponse;
-import com.tinqin.zoostore.exception.MissingFileException;
-import com.tinqin.zoostore.exception.MultimediaDeletionException;
-import com.tinqin.zoostore.exception.NoSuchMultimediaException;
-import com.tinqin.zoostore.exception.NullOrEmptyStringException;
-import com.tinqin.zoostore.exception.UnsupportedFileTypeException;
+import com.tinqin.zoostore.api.request.multimedia.MultimediaDeleteRequest;
+import com.tinqin.zoostore.api.request.multimedia.MultimediaRetrieveRequest;
+import com.tinqin.zoostore.api.request.multimedia.MultimediaUploadRequest;
+import com.tinqin.zoostore.api.response.multimedia.MultimediaDeleteResponse;
+import com.tinqin.zoostore.api.response.multimedia.MultimediaRetrieveResponse;
+import com.tinqin.zoostore.api.response.multimedia.MultimediaUploadResponse;
+import com.tinqin.zoostore.exception.multimedia.MultimediaDeletionException;
+import com.tinqin.zoostore.exception.multimedia.NoSuchMultimediaException;
+import com.tinqin.zoostore.exception.multimedia.UnsupportedFileTypeException;
 import com.tinqin.zoostore.service.MultimediaService;
 import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
@@ -34,22 +37,18 @@ public class MultimediaController {
     }
 
     @GetMapping("/retrieveMultimedia")
-    public ResponseEntity<MultimediaRetrieveResponse> retrieve(@RequestParam(name = "public_id") String publicId) {
-        if (publicId == null || publicId.trim().equals("")) {
-            throw new NullOrEmptyStringException();
-        }
-
-        MultimediaRetrieveResponse multimedia = this.multimediaService.retrieveMultimedia(publicId);
+    public ResponseEntity<MultimediaRetrieveResponse> retrieve(
+            @Valid @RequestBody MultimediaRetrieveRequest multimediaRetrieveRequest
+    ) {
+        MultimediaRetrieveResponse multimedia = this.multimediaService.retrieveMultimedia(multimediaRetrieveRequest.getPublicId());
 
         return ResponseEntity.ok(multimedia);
     }
 
     @PostMapping("/uploadMultimedia")
-    public ResponseEntity<MultimediaUploadResponse> upload(MultimediaUploadRequest fileUpload) throws IOException {
-        if (fileUpload.getFile().isEmpty()) {
-            throw new MissingFileException();
-        }
-
+    public ResponseEntity<MultimediaUploadResponse> upload(
+            @Valid MultimediaUploadRequest fileUpload
+    ) throws IOException {
         MultimediaUploadResponse response = this.multimediaService.uploadMultimedia(fileUpload);
 
         return ResponseEntity.
@@ -59,24 +58,23 @@ public class MultimediaController {
 
     @Transactional
     @DeleteMapping("/deleteMultimedia")
-    public ResponseEntity<MultimediaDeleteResponse> delete(@RequestParam(name = "public_id") String publicId) {
-        if (publicId == null || publicId.trim().equals("")) {
-            throw new NullOrEmptyStringException();
-        }
-
-        MultimediaDeleteResponse deletedMultimedia = this.multimediaService.deleteMultimedia(publicId);
+    public ResponseEntity<MultimediaDeleteResponse> delete(
+            @Valid @RequestBody MultimediaDeleteRequest multimediaDeleteRequest
+    ) {
+        MultimediaDeleteResponse deletedMultimedia = this.multimediaService.deleteMultimedia(multimediaDeleteRequest.getPublicId());
 
         return ResponseEntity.ok(deletedMultimedia);
     }
 
-    @ExceptionHandler(value = MissingFileException.class)
-    public ResponseEntity<String> handleMissingFileException(MissingFileException ex) {
-        return ResponseEntity.status(404).body(ex.getMessage());
-    }
+    @ExceptionHandler(value = MethodArgumentNotValidException.class)
+    public ResponseEntity<String> handleNullOrEmptyFieldException(MethodArgumentNotValidException ex) {
+        StringBuilder sb = new StringBuilder();
 
-    @ExceptionHandler(value = NullOrEmptyStringException.class)
-    public ResponseEntity<String> handleNullOrEmptyPublicIdException(NullOrEmptyStringException ex) {
-        return ResponseEntity.badRequest().body(ex.getMessage());
+        for (FieldError fieldError : ex.getBindingResult().getFieldErrors()) {
+            sb.append(fieldError.getDefaultMessage()).append("\n");
+        }
+
+        return ResponseEntity.badRequest().body(sb.toString());
     }
 
     @ExceptionHandler(value = UnsupportedFileTypeException.class)
