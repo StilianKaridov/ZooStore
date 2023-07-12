@@ -1,5 +1,6 @@
-package com.tinqin.zoostore.api.response;
+package com.tinqin.zoostore.api.request.multimedia;
 
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -9,9 +10,8 @@ import lombok.Setter;
 @AllArgsConstructor
 @Getter
 @Setter
-public class MultimediaUploadResponse {
+public class MultimediaDeleteRequest {
 
-    private String url;
-
+    @NotBlank(message = "The public id must not be empty!")
     private String publicId;
 }

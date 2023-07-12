@@ -1,16 +1,15 @@
-package com.tinqin.zoostore.api.request;
+package com.tinqin.zoostore.api.response.multimedia;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.web.multipart.MultipartFile;
 
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
 @Setter
-public class MultimediaUploadRequest {
+public class MultimediaRetrieveResponse {
 
-    private MultipartFile file;
+    private String url;
 }

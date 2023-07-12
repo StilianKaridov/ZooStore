@@ -1,19 +1,17 @@
-package com.tinqin.zoostore.api.response;
+package com.tinqin.zoostore.api.response.multimedia;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.UUID;
+
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
 @Setter
-public class MultimediaDeleteResponse {
+public class MultimediaRemoveFromItemResponse {
 
-    private String url;
-
-    private String publicId;
-
-    private String type;
+    private UUID id;
 }
