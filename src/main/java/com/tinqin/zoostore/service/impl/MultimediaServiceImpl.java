@@ -49,13 +49,11 @@ public class MultimediaServiceImpl implements MultimediaService {
 
     @Override
     public MultimediaRetrieveResponse retrieveMultimedia(String publicId) {
-        Optional<Multimedia> multimediaOpt = this.multimediaRepository.findByPublicId(publicId);
+        Multimedia multimedia = this.multimediaRepository
+                .findByPublicId(publicId)
+                .orElseThrow(NoSuchMultimediaException::new);
 
-        if(multimediaOpt.isEmpty()){
-            throw new NoSuchMultimediaException();
-        }
-
-        return this.modelMapper.map(multimediaOpt.get(), MultimediaRetrieveResponse.class);
+        return this.modelMapper.map(multimedia, MultimediaRetrieveResponse.class);
     }
 
     @Override
@@ -94,14 +92,12 @@ public class MultimediaServiceImpl implements MultimediaService {
 
     @Override
     public MultimediaDeleteResponse deleteMultimedia(String publicId) {
-        Optional<Multimedia> multimediaOpt = this.multimediaRepository.findByPublicId(publicId);
-
-        if (multimediaOpt.isEmpty()) {
-            throw new NoSuchMultimediaException();
-        }
+        Multimedia multimedia = this.multimediaRepository
+                .findByPublicId(publicId)
+                .orElseThrow(NoSuchMultimediaException::new);
 
         Map<String, String> params = new HashMap<>();
-        params.put(RESOURCE_TYPE_LABEL, multimediaOpt.get().getType());
+        params.put(RESOURCE_TYPE_LABEL, multimedia.getType());
 
         try {
             this.cloudinary.uploader().destroy(publicId, params);
@@ -111,7 +107,7 @@ public class MultimediaServiceImpl implements MultimediaService {
 
         this.multimediaRepository.deleteByPublicId(publicId);
 
-        return this.modelMapper.map(multimediaOpt.get(), MultimediaDeleteResponse.class);
+        return this.modelMapper.map(multimedia, MultimediaDeleteResponse.class);
     }
 
     private String getFileResourceType(MultipartFile file) {
