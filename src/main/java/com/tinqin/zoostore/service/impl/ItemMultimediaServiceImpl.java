@@ -8,8 +8,8 @@ import com.tinqin.zoostore.data.entity.Item;
 import com.tinqin.zoostore.data.entity.Multimedia;
 import com.tinqin.zoostore.data.repository.ItemRepository;
 import com.tinqin.zoostore.data.repository.MultimediaRepository;
-import com.tinqin.zoostore.exception.multimedia.MultimediaDoesntBelongItemException;
 import com.tinqin.zoostore.exception.item.NoSuchItemException;
+import com.tinqin.zoostore.exception.multimedia.MultimediaDoesntBelongItemException;
 import com.tinqin.zoostore.exception.multimedia.NoSuchMultimediaException;
 import com.tinqin.zoostore.service.ItemMultimediaService;
 import org.modelmapper.ModelMapper;
@@ -53,11 +53,20 @@ public class ItemMultimediaServiceImpl implements ItemMultimediaService {
             toAddToItem.add(multimedia);
         }
 
-        item.setMultimedia(toAddToItem);
+        Item itemWithAddedMultimedia = Item
+                .builder()
+                .id(item.getId())
+                .title(item.getTitle())
+                .description(item.getDescription())
+                .isArchived(item.getIsArchived())
+                .vendor(item.getVendor())
+                .tags(item.getTags())
+                .multimedia(toAddToItem)
+                .build();
 
-        this.itemRepository.save(item);
+        this.itemRepository.save(itemWithAddedMultimedia);
 
-        return this.modelMapper.map(item, ItemAddMultimediaResponse.class);
+        return this.modelMapper.map(itemWithAddedMultimedia, ItemAddMultimediaResponse.class);
     }
 
     @Override
@@ -84,6 +93,4 @@ public class ItemMultimediaServiceImpl implements ItemMultimediaService {
 
         return this.modelMapper.map(item, ItemRemoveMultimediaResponse.class);
     }
-
-
 }

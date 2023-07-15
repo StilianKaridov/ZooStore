@@ -53,11 +53,20 @@ public class ItemTagServiceImpl implements ItemTagService {
             toAddToItem.add(tag);
         }
 
-        item.setTags(toAddToItem);
+        Item itemWithUpdatedTags = Item
+                .builder()
+                .id(item.getId())
+                .title(item.getTitle())
+                .description(item.getDescription())
+                .isArchived(item.getIsArchived())
+                .vendor(item.getVendor())
+                .tags(toAddToItem)
+                .multimedia(item.getMultimedia())
+                .build();
 
-        this.itemRepository.save(item);
+        this.itemRepository.save(itemWithUpdatedTags);
 
-        return this.modelMapper.map(item, ItemAddTagResponse.class);
+        return this.modelMapper.map(itemWithUpdatedTags, ItemAddTagResponse.class);
     }
 
     @Override

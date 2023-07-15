@@ -45,10 +45,12 @@ public class VendorServiceImpl implements VendorService {
             throw new VendorAlreadyExistingException();
         }
 
-        Vendor vendor = new Vendor();
-        vendor.setName(vendorName);
-        vendor.setPhoneNumber(phoneNumber);
-        vendor.setIsArchived(Boolean.FALSE);
+        Vendor vendor = Vendor
+                .builder()
+                .name(vendorName)
+                .phoneNumber(phoneNumber)
+                .isArchived(Boolean.FALSE)
+                .build();
 
         this.vendorRepository.save(vendor);
 
@@ -67,11 +69,18 @@ public class VendorServiceImpl implements VendorService {
             throw new VendorAlreadyExistingException();
         }
 
-        vendor.setName(vendorNewName);
+        Vendor updatedVendor = Vendor
+                .builder()
+                .id(vendor.getId())
+                .name(vendorNewName)
+                .phoneNumber(vendor.getPhoneNumber())
+                .isArchived(vendor.getIsArchived())
+                .items(vendor.getItems())
+                .build();
 
-        this.vendorRepository.save(vendor);
+        this.vendorRepository.save(updatedVendor);
 
-        return this.modelMapper.map(vendor, VendorUpdateNameResponse.class);
+        return this.modelMapper.map(updatedVendor, VendorUpdateNameResponse.class);
     }
 
     @Override
@@ -86,11 +95,18 @@ public class VendorServiceImpl implements VendorService {
             throw new VendorAlreadyExistingException();
         }
 
-        vendor.setPhoneNumber(vendorNewPhone);
+        Vendor updatedVendor = Vendor
+                .builder()
+                .id(vendor.getId())
+                .name(vendor.getName())
+                .phoneNumber(vendorNewPhone)
+                .isArchived(vendor.getIsArchived())
+                .items(vendor.getItems())
+                .build();
 
-        this.vendorRepository.save(vendor);
+        this.vendorRepository.save(updatedVendor);
 
-        return this.modelMapper.map(vendor, VendorUpdatePhoneResponse.class);
+        return this.modelMapper.map(updatedVendor, VendorUpdatePhoneResponse.class);
     }
 
     @Override
@@ -103,11 +119,18 @@ public class VendorServiceImpl implements VendorService {
             throw new VendorAlreadyArchivedException();
         }
 
-        vendor.setIsArchived(Boolean.TRUE);
+        Vendor archivedVendor = Vendor
+                .builder()
+                .id(vendor.getId())
+                .name(vendor.getName())
+                .phoneNumber(vendor.getPhoneNumber())
+                .isArchived(Boolean.TRUE)
+                .items(vendor.getItems())
+                .build();
 
-        this.vendorRepository.save(vendor);
+        this.vendorRepository.save(archivedVendor);
 
-        return this.modelMapper.map(vendor, VendorArchiveResponse.class);
+        return this.modelMapper.map(archivedVendor, VendorArchiveResponse.class);
     }
 
     @Override
@@ -120,11 +143,18 @@ public class VendorServiceImpl implements VendorService {
             throw new VendorAlreadyUnarchivedException();
         }
 
-        vendor.setIsArchived(Boolean.FALSE);
+        Vendor unarchivedVendor = Vendor
+                .builder()
+                .id(vendor.getId())
+                .name(vendor.getName())
+                .phoneNumber(vendor.getPhoneNumber())
+                .isArchived(Boolean.FALSE)
+                .items(vendor.getItems())
+                .build();
 
-        this.vendorRepository.save(vendor);
+        this.vendorRepository.save(unarchivedVendor);
 
-        return this.modelMapper.map(vendor, VendorUnarchiveResponse.class);
+        return this.modelMapper.map(unarchivedVendor, VendorUnarchiveResponse.class);
     }
 
     @Override

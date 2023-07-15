@@ -20,7 +20,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 
 @Service
 public class MultimediaServiceImpl implements MultimediaService {
@@ -65,8 +64,7 @@ public class MultimediaServiceImpl implements MultimediaService {
         File tempFile = File.createTempFile(TEMP_FILE_LABEL, file.getOriginalFilename());
         file.transferTo(tempFile);
 
-        Multimedia multimedia = new Multimedia();
-        multimedia.setType(fileResourceType);
+        Multimedia multimedia;
 
         try {
             @SuppressWarnings("unchecked")
@@ -79,8 +77,12 @@ public class MultimediaServiceImpl implements MultimediaService {
             String url = uploadResult.getOrDefault(URL_LABEL, URL_DEFAULT_VALUE);
             String publicId = uploadResult.getOrDefault(PUBLIC_ID_LABEL, PUBLIC_ID_VALUE);
 
-            multimedia.setUrl(url);
-            multimedia.setPublicId(publicId);
+            multimedia = Multimedia
+                    .builder()
+                    .type(fileResourceType)
+                    .url(url)
+                    .publicId(publicId)
+                    .build();
         } finally {
             tempFile.delete();
         }

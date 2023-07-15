@@ -48,16 +48,17 @@ public class ItemServiceImpl implements ItemService {
             throw new ItemAlreadyExistingException();
         }
 
-        Item item = new Item();
-
-        item.setTitle(itemCreateRequest.getTitle());
-        item.setDescription(itemCreateRequest.getDescription());
-        item.setIsArchived(Boolean.FALSE);
-
         UUID id = UUID.fromString(itemCreateRequest.getVendorId());
 
         Vendor vendor = this.vendorService.getVendorById(id);
-        item.setVendor(vendor);
+
+        Item item = Item
+                .builder()
+                .title(itemCreateRequest.getTitle())
+                .description(itemCreateRequest.getDescription())
+                .isArchived(Boolean.FALSE)
+                .vendor(vendor)
+                .build();
 
         this.itemRepository.save(item);
 
@@ -80,11 +81,20 @@ public class ItemServiceImpl implements ItemService {
 
         String newTitle = itemUpdateTitleRequest.getNewTitle();
 
-        itemById.setTitle(newTitle);
+        Item itemWithUpdatedTitle = Item
+                .builder()
+                .id(itemById.getId())
+                .title(newTitle)
+                .description(itemById.getDescription())
+                .isArchived(itemById.getIsArchived())
+                .vendor(itemById.getVendor())
+                .tags(itemById.getTags())
+                .multimedia(itemById.getMultimedia())
+                .build();
 
-        this.itemRepository.save(itemById);
+        this.itemRepository.save(itemWithUpdatedTitle);
 
-        return this.modelMapper.map(itemById, ItemUpdateTitleResponse.class);
+        return this.modelMapper.map(itemWithUpdatedTitle, ItemUpdateTitleResponse.class);
     }
 
     @Override
@@ -97,11 +107,20 @@ public class ItemServiceImpl implements ItemService {
 
         String newDescription = itemUpdateRequest.getNewDescription();
 
-        itemById.setDescription(newDescription);
+        Item itemWithUpdatedDescription = Item
+                .builder()
+                .id(itemById.getId())
+                .title(itemById.getTitle())
+                .description(newDescription)
+                .isArchived(itemById.getIsArchived())
+                .vendor(itemById.getVendor())
+                .tags(itemById.getTags())
+                .multimedia(itemById.getMultimedia())
+                .build();
 
-        this.itemRepository.save(itemById);
+        this.itemRepository.save(itemWithUpdatedDescription);
 
-        return this.modelMapper.map(itemById, ItemUpdateDescriptionResponse.class);
+        return this.modelMapper.map(itemWithUpdatedDescription, ItemUpdateDescriptionResponse.class);
     }
 
     @Override
@@ -116,11 +135,20 @@ public class ItemServiceImpl implements ItemService {
             throw new ItemAlreadyArchivedException();
         }
 
-        itemById.setIsArchived(Boolean.TRUE);
+        Item archivedItem = Item
+                .builder()
+                .id(itemById.getId())
+                .title(itemById.getTitle())
+                .description(itemById.getDescription())
+                .isArchived(Boolean.TRUE)
+                .vendor(itemById.getVendor())
+                .tags(itemById.getTags())
+                .multimedia(itemById.getMultimedia())
+                .build();
 
-        this.itemRepository.save(itemById);
+        this.itemRepository.save(archivedItem);
 
-        return this.modelMapper.map(itemById, ItemArchiveResponse.class);
+        return this.modelMapper.map(archivedItem, ItemArchiveResponse.class);
     }
 
     @Override
@@ -135,10 +163,19 @@ public class ItemServiceImpl implements ItemService {
             throw new ItemAlreadyUnarchivedException();
         }
 
-        itemById.setIsArchived(Boolean.FALSE);
+        Item unarchivedItem = Item
+                .builder()
+                .id(itemById.getId())
+                .title(itemById.getTitle())
+                .description(itemById.getDescription())
+                .isArchived(Boolean.FALSE)
+                .vendor(itemById.getVendor())
+                .tags(itemById.getTags())
+                .multimedia(itemById.getMultimedia())
+                .build();
 
-        this.itemRepository.save(itemById);
+        this.itemRepository.save(unarchivedItem);
 
-        return this.modelMapper.map(itemById, ItemUnarchiveResponse.class);
+        return this.modelMapper.map(unarchivedItem, ItemUnarchiveResponse.class);
     }
 }

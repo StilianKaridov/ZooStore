@@ -17,8 +17,6 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
-
 @Service
 public class TagServiceImpl implements TagService {
 
@@ -39,9 +37,11 @@ public class TagServiceImpl implements TagService {
             throw new OccupiedTagTitleException();
         }
 
-        Tag tagEntity = new Tag();
-        tagEntity.setTitle(title);
-        tagEntity.setIsArchived(Boolean.FALSE);
+        Tag tagEntity = Tag
+                .builder()
+                .title(title)
+                .isArchived(Boolean.FALSE)
+                .build();
 
         this.tagRepository.save(tagEntity);
 
@@ -53,18 +53,21 @@ public class TagServiceImpl implements TagService {
         String oldTitle = tagUpdateRequest.getOldTitle();
         String newTitle = tagUpdateRequest.getNewTitle();
 
-        if (!checkIfTitleExists(oldTitle)) {
-            throw new NoSuchTagException();
-        }
+        Tag tag = this.tagRepository
+                .findTagByTitle(oldTitle)
+                .orElseThrow(NoSuchTagException::new);
 
         if (checkIfTitleExists(newTitle)) {
             throw new OccupiedTagTitleException();
         }
 
-        Optional<Tag> tagByTitle = this.tagRepository.findTagByTitle(oldTitle);
-
-        Tag updated = tagByTitle.get();
-        updated.setTitle(newTitle);
+        Tag updated = Tag
+                .builder()
+                .id(tag.getId())
+                .title(newTitle)
+                .isArchived(tag.getIsArchived())
+                .items(tag.getItems())
+                .build();
 
         this.tagRepository.save(updated);
 
@@ -81,11 +84,17 @@ public class TagServiceImpl implements TagService {
             throw new TagAlreadyArchivedException();
         }
 
-        tag.setIsArchived(Boolean.TRUE);
+        Tag archivedTag = Tag
+                .builder()
+                .id(tag.getId())
+                .title(tag.getTitle())
+                .isArchived(Boolean.TRUE)
+                .items(tag.getItems())
+                .build();
 
-        this.tagRepository.save(tag);
+        this.tagRepository.save(archivedTag);
 
-        return this.modelMapper.map(tag, TagArchiveResponse.class);
+        return this.modelMapper.map(archivedTag, TagArchiveResponse.class);
     }
 
     @Override
@@ -98,11 +107,17 @@ public class TagServiceImpl implements TagService {
             throw new TagAlreadyUnarchivedException();
         }
 
-        tag.setIsArchived(Boolean.FALSE);
+        Tag unarchivedTag = Tag
+                .builder()
+                .id(tag.getId())
+                .title(tag.getTitle())
+                .isArchived(Boolean.FALSE)
+                .items(tag.getItems())
+                .build();
 
-        this.tagRepository.save(tag);
+        this.tagRepository.save(unarchivedTag);
 
-        return this.modelMapper.map(tag, TagUnarchiveResponse.class);
+        return this.modelMapper.map(unarchivedTag, TagUnarchiveResponse.class);
     }
 
     private boolean checkIfTitleExists(String title) {
