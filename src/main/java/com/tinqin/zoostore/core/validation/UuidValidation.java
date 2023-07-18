@@ -11,11 +11,11 @@ import java.lang.annotation.Target;
 
 @Target({ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
-@Constraint(validatedBy = EachNotBlankValidator.class)
+@Constraint(validatedBy = UuidValidator.class)
 @Documented
-public @interface EachNotBlank {
+public @interface UuidValidation {
 
-    String message() default "Each element of the collection must not be blank!";
+    String message() default "Invalid UUID in the collection!";
     Class<?>[] groups() default {};
     Class<? extends Payload>[] payload() default {};
 }
