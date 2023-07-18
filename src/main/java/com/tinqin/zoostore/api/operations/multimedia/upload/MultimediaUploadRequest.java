@@ -1,7 +1,7 @@
 package com.tinqin.zoostore.api.operations.multimedia.upload;
 
 import com.tinqin.zoostore.api.operations.base.OperationRequest;
-import com.tinqin.zoostore.api.validator.FileNotEmpty;
+import com.tinqin.zoostore.core.validation.FileNotEmpty;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

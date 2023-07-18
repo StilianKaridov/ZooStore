@@ -1,4 +1,4 @@
-package com.tinqin.zoostore.api.validator;
+package com.tinqin.zoostore.core.validation;
 
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
