@@ -6,6 +6,9 @@ import com.tinqin.zoostore.api.operations.item.archive.ItemArchiveResponse;
 import com.tinqin.zoostore.api.operations.item.create.ItemCreateOperation;
 import com.tinqin.zoostore.api.operations.item.create.ItemCreateRequest;
 import com.tinqin.zoostore.api.operations.item.create.ItemCreateResponse;
+import com.tinqin.zoostore.api.operations.item.get.GetItemByIdOperation;
+import com.tinqin.zoostore.api.operations.item.get.GetItemByIdRequest;
+import com.tinqin.zoostore.api.operations.item.get.GetItemByIdResponse;
 import com.tinqin.zoostore.api.operations.item.unarchive.ItemUnarchiveOperation;
 import com.tinqin.zoostore.api.operations.item.unarchive.ItemUnarchiveRequest;
 import com.tinqin.zoostore.api.operations.item.unarchive.ItemUnarchiveResponse;
@@ -30,10 +33,14 @@ import com.tinqin.zoostore.api.operations.itemtag.remove.ItemRemoveTagResponse;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.UUID;
 
 @RestController
 public class ItemController {
@@ -47,6 +54,7 @@ public class ItemController {
     private final ItemRemoveMultimediaOperation itemRemoveMultimediaOperation;
     private final ItemAddTagOperation itemAddTagOperation;
     private final ItemRemoveTagOperation itemRemoveTagOperation;
+    private final GetItemByIdOperation getItemByIdOperation;
 
     @Autowired
     public ItemController(
@@ -58,8 +66,8 @@ public class ItemController {
             ItemAddMultimediaOperation itemAddMultimediaOperation,
             ItemRemoveMultimediaOperation itemRemoveMultimediaOperation,
             ItemAddTagOperation itemAddTagOperation,
-            ItemRemoveTagOperation itemRemoveTagOperation
-    ) {
+            ItemRemoveTagOperation itemRemoveTagOperation,
+            GetItemByIdOperation getItemByIdOperation) {
         this.itemCreateOperation = itemCreateOperation;
         this.itemUpdateTitleOperation = itemUpdateTitleOperation;
         this.itemUpdateDescriptionOperation = itemUpdateDescriptionOperation;
@@ -69,8 +77,20 @@ public class ItemController {
         this.itemRemoveMultimediaOperation = itemRemoveMultimediaOperation;
         this.itemAddTagOperation = itemAddTagOperation;
         this.itemRemoveTagOperation = itemRemoveTagOperation;
+        this.getItemByIdOperation = getItemByIdOperation;
     }
 
+    @GetMapping("/getItem/{id}")
+    public ResponseEntity<GetItemByIdResponse> getItemById(@PathVariable UUID id) {
+        GetItemByIdRequest itemRequest = GetItemByIdRequest
+                .builder()
+                .id(id)
+                .build();
+
+        GetItemByIdResponse response = this.getItemByIdOperation.process(itemRequest);
+
+        return ResponseEntity.ok(response);
+    }
 
     @PostMapping("/createItem")
     public ResponseEntity<ItemCreateResponse> createItem(

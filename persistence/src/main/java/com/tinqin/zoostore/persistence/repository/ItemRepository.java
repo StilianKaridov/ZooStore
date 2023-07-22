@@ -10,5 +10,7 @@ import java.util.UUID;
 @Repository
 public interface ItemRepository extends JpaRepository<Item, UUID> {
 
+    Optional<Item> getItemById(UUID id);
+
     Optional<Item> findFirstByTitle(String title);
 }
