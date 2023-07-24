@@ -9,6 +9,8 @@ import com.tinqin.zoostore.persistence.repository.ItemRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.UUID;
+
 @Service
 public class GetItemByIdOperationProcessor implements GetItemByIdOperation {
 
@@ -21,7 +23,9 @@ public class GetItemByIdOperationProcessor implements GetItemByIdOperation {
 
     @Override
     public GetItemByIdResponse process(GetItemByIdRequest input) {
-        Item item = itemRepository.getItemById(input.getId()).orElseThrow(NoSuchItemException::new);
+        UUID itemId = UUID.fromString(input.getId());
+
+        Item item = itemRepository.getItemById(itemId).orElseThrow(NoSuchItemException::new);
 
         return GetItemByIdResponse.builder().itemId(item.getId()).build();
     }

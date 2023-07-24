@@ -81,7 +81,7 @@ public class ItemController {
     }
 
     @GetMapping("/getItem/{id}")
-    public ResponseEntity<GetItemByIdResponse> getItemById(@PathVariable UUID id) {
+    public ResponseEntity<GetItemByIdResponse> getItemById(@PathVariable String id) {
         GetItemByIdRequest itemRequest = GetItemByIdRequest
                 .builder()
                 .id(id)

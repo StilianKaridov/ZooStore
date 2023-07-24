@@ -8,8 +8,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.UUID;
-
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Getter
@@ -17,5 +15,5 @@ import java.util.UUID;
 @Builder
 public class GetItemByIdRequest implements OperationRequest {
 
-    private UUID id;
+    private String id;
 }
