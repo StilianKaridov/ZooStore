@@ -1,4 +1,4 @@
-package com.tinqin.zoostore.api.operations.item.get;
+package com.tinqin.zoostore.api.operations.item.update;
 
 import com.tinqin.zoostore.api.operations.base.OperationResponse;
 import lombok.AccessLevel;
@@ -8,16 +8,16 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.UUID;
-
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Getter
 @Setter(AccessLevel.PRIVATE)
 @Builder
-public class GetItemByIdResponse implements OperationResponse {
+public class ItemUpdateResponse implements OperationResponse {
 
-    private UUID itemId;
+    private String itemId;
 
     private String title;
+
+    private String description;
 }

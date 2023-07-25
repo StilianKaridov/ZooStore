@@ -27,6 +27,6 @@ public class GetItemByIdOperationProcessor implements GetItemByIdOperation {
 
         Item item = itemRepository.getItemById(itemId).orElseThrow(NoSuchItemException::new);
 
-        return GetItemByIdResponse.builder().itemId(item.getId()).build();
+        return GetItemByIdResponse.builder().itemId(item.getId()).title(item.getTitle()).build();
     }
 }

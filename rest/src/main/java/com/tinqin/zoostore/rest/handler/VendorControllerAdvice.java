@@ -1,5 +1,6 @@
 package com.tinqin.zoostore.rest.handler;
 
+import com.tinqin.zoostore.core.exception.vendor.InvalidPhoneNumberFormatException;
 import com.tinqin.zoostore.core.exception.vendor.NoSuchVendorException;
 import com.tinqin.zoostore.core.exception.vendor.VendorAlreadyExistingException;
 import com.tinqin.zoostore.core.exception.vendor.VendorAlreadyUnarchivedException;
@@ -24,6 +25,11 @@ public class VendorControllerAdvice {
         }
 
         return ResponseEntity.badRequest().body(sb.toString());
+    }
+
+    @ExceptionHandler(value = InvalidPhoneNumberFormatException.class)
+    public ResponseEntity<String> handleInvalidPhoneNumberFormatException(InvalidPhoneNumberFormatException ex) {
+        return ResponseEntity.badRequest().body(ex.getMessage());
     }
 
     @ExceptionHandler(value = VendorAlreadyExistingException.class)

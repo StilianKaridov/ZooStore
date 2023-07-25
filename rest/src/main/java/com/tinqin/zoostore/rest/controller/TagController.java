@@ -18,9 +18,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
+@RequestMapping("/api/zoostore/tags")
 public class TagController {
 
     private final TagCreateOperation tagCreateOperation;
@@ -42,7 +44,7 @@ public class TagController {
     }
 
 
-    @PostMapping("/createTag")
+    @PostMapping
     public ResponseEntity<TagCreateResponse> createTag(
             @Valid @RequestBody TagCreateRequest tagCreateRequest
     ) {
@@ -53,7 +55,7 @@ public class TagController {
                 body(tagResponse);
     }
 
-    @PatchMapping("/updateTag")
+    @PatchMapping("/update")
     public ResponseEntity<TagUpdateResponse> updateTag(
             @Valid @RequestBody TagUpdateRequest tagUpdateRequest
     ) {
@@ -62,7 +64,7 @@ public class TagController {
         return ResponseEntity.ok(updatedTag);
     }
 
-    @PatchMapping("/archiveTag/{title}")
+    @PatchMapping("/archive")
     public ResponseEntity<TagArchiveResponse> archiveTag(
             @Valid @RequestBody TagArchiveRequest tagArchiveRequest
     ) {
@@ -71,7 +73,7 @@ public class TagController {
         return ResponseEntity.ok(archivedTag);
     }
 
-    @PatchMapping("/unarchiveTag/{title}")
+    @PatchMapping("/unarchive")
     public ResponseEntity<TagUnarchiveResponse> unarchiveTag(
             @Valid @RequestBody TagUnarchiveRequest tagUnarchiveRequest
     ) {

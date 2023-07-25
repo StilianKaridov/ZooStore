@@ -72,7 +72,7 @@ class TagControllerTest {
                 .build();
 
         mockMvc.perform(
-                        post("/createTag").
+                        post("/api/zoostore/tags").
                                 contentType(MediaType.APPLICATION_JSON).
                                 content(objectMapper.writeValueAsString(tag)).
                                 accept(MediaType.APPLICATION_JSON)
@@ -90,7 +90,7 @@ class TagControllerTest {
                 .build();
 
         mockMvc.perform(
-                        post("/createTag")
+                        post("/api/zoostore/tags")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(occupied))
                                 .accept(MediaType.APPLICATION_JSON))
@@ -106,7 +106,7 @@ class TagControllerTest {
                 .build();
 
         mockMvc.perform(
-                        post("/createTag")
+                        post("/api/zoostore/tags")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(empty))
                                 .accept(MediaType.APPLICATION_JSON)
@@ -124,7 +124,7 @@ class TagControllerTest {
                 .build();
 
         mockMvc.perform(
-                        patch("/updateTag")
+                        patch("/api/zoostore/tags/update")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(tag))
                                 .accept(MediaType.APPLICATION_JSON)
@@ -142,7 +142,7 @@ class TagControllerTest {
                 .build();
 
         mockMvc.perform(
-                        patch("/updateTag")
+                        patch("/api/zoostore/tags/update")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(tag))
                                 .accept(MediaType.APPLICATION_JSON)
@@ -160,7 +160,7 @@ class TagControllerTest {
                 .build();
         
         mockMvc.perform(
-                        patch("/updateTag")
+                        patch("/api/zoostore/tags/update")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(tag))
                                 .accept(MediaType.APPLICATION_JSON)

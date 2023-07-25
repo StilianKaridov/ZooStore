@@ -15,11 +15,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
+@RequestMapping("/api/zoostore/multimedia")
 public class MultimediaController {
 
     private final MultimediaRetrieveOperation multimediaRetrieveOperation;
@@ -38,16 +41,21 @@ public class MultimediaController {
     }
 
 
-    @GetMapping("/retrieveMultimedia")
+    @GetMapping("/{publicId}")
     public ResponseEntity<MultimediaRetrieveResponse> retrieve(
-            @Valid @RequestBody MultimediaRetrieveRequest multimediaRetrieveRequest
+            @PathVariable String publicId
     ) {
+        MultimediaRetrieveRequest multimediaRetrieveRequest = MultimediaRetrieveRequest
+                .builder()
+                .publicId(publicId)
+                .build();
+
         MultimediaRetrieveResponse multimedia = this.multimediaRetrieveOperation.process(multimediaRetrieveRequest);
 
         return ResponseEntity.ok(multimedia);
     }
 
-    @PostMapping("/uploadMultimedia")
+    @PostMapping
     public ResponseEntity<MultimediaUploadResponse> upload(
             @Valid MultimediaUploadRequest fileUpload
     ) {
@@ -59,7 +67,7 @@ public class MultimediaController {
     }
 
     @Transactional
-    @DeleteMapping("/deleteMultimedia")
+    @DeleteMapping
     public ResponseEntity<MultimediaDeleteResponse> delete(
             @Valid @RequestBody MultimediaDeleteRequest multimediaDeleteRequest
     ) {

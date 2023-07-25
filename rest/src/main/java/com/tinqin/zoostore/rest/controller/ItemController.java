@@ -12,12 +12,9 @@ import com.tinqin.zoostore.api.operations.item.get.GetItemByIdResponse;
 import com.tinqin.zoostore.api.operations.item.unarchive.ItemUnarchiveOperation;
 import com.tinqin.zoostore.api.operations.item.unarchive.ItemUnarchiveRequest;
 import com.tinqin.zoostore.api.operations.item.unarchive.ItemUnarchiveResponse;
-import com.tinqin.zoostore.api.operations.item.update.description.ItemUpdateDescriptionOperation;
-import com.tinqin.zoostore.api.operations.item.update.description.ItemUpdateDescriptionRequest;
-import com.tinqin.zoostore.api.operations.item.update.description.ItemUpdateDescriptionResponse;
-import com.tinqin.zoostore.api.operations.item.update.title.ItemUpdateTitleOperation;
-import com.tinqin.zoostore.api.operations.item.update.title.ItemUpdateTitleRequest;
-import com.tinqin.zoostore.api.operations.item.update.title.ItemUpdateTitleResponse;
+import com.tinqin.zoostore.api.operations.item.update.ItemUpdateOperation;
+import com.tinqin.zoostore.api.operations.item.update.ItemUpdateRequest;
+import com.tinqin.zoostore.api.operations.item.update.ItemUpdateResponse;
 import com.tinqin.zoostore.api.operations.itemmultimedia.add.ItemAddMultimediaOperation;
 import com.tinqin.zoostore.api.operations.itemmultimedia.add.ItemAddMultimediaRequest;
 import com.tinqin.zoostore.api.operations.itemmultimedia.add.ItemAddMultimediaResponse;
@@ -37,17 +34,16 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.UUID;
-
 @RestController
+@RequestMapping("/api/zoostore/items")
 public class ItemController {
 
     private final ItemCreateOperation itemCreateOperation;
-    private final ItemUpdateTitleOperation itemUpdateTitleOperation;
-    private final ItemUpdateDescriptionOperation itemUpdateDescriptionOperation;
     private final ItemArchiveOperation itemArchiveOperation;
     private final ItemUnarchiveOperation itemUnarchiveOperation;
     private final ItemAddMultimediaOperation itemAddMultimediaOperation;
@@ -55,22 +51,19 @@ public class ItemController {
     private final ItemAddTagOperation itemAddTagOperation;
     private final ItemRemoveTagOperation itemRemoveTagOperation;
     private final GetItemByIdOperation getItemByIdOperation;
+    private final ItemUpdateOperation itemUpdateOperation;
 
     @Autowired
     public ItemController(
             ItemCreateOperation itemCreateOperation,
-            ItemUpdateTitleOperation itemUpdateTitleOperation,
-            ItemUpdateDescriptionOperation itemUpdateDescriptionOperation,
             ItemArchiveOperation itemArchiveOperation,
             ItemUnarchiveOperation itemUnarchiveOperation,
             ItemAddMultimediaOperation itemAddMultimediaOperation,
             ItemRemoveMultimediaOperation itemRemoveMultimediaOperation,
             ItemAddTagOperation itemAddTagOperation,
             ItemRemoveTagOperation itemRemoveTagOperation,
-            GetItemByIdOperation getItemByIdOperation) {
+            GetItemByIdOperation getItemByIdOperation, ItemUpdateOperation itemUpdateOperation) {
         this.itemCreateOperation = itemCreateOperation;
-        this.itemUpdateTitleOperation = itemUpdateTitleOperation;
-        this.itemUpdateDescriptionOperation = itemUpdateDescriptionOperation;
         this.itemArchiveOperation = itemArchiveOperation;
         this.itemUnarchiveOperation = itemUnarchiveOperation;
         this.itemAddMultimediaOperation = itemAddMultimediaOperation;
@@ -78,9 +71,10 @@ public class ItemController {
         this.itemAddTagOperation = itemAddTagOperation;
         this.itemRemoveTagOperation = itemRemoveTagOperation;
         this.getItemByIdOperation = getItemByIdOperation;
+        this.itemUpdateOperation = itemUpdateOperation;
     }
 
-    @GetMapping("/getItem/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<GetItemByIdResponse> getItemById(@PathVariable String id) {
         GetItemByIdRequest itemRequest = GetItemByIdRequest
                 .builder()
@@ -92,7 +86,7 @@ public class ItemController {
         return ResponseEntity.ok(response);
     }
 
-    @PostMapping("/createItem")
+    @PostMapping
     public ResponseEntity<ItemCreateResponse> createItem(
             @Valid @RequestBody ItemCreateRequest itemCreateRequest
     ) {
@@ -101,25 +95,16 @@ public class ItemController {
         return ResponseEntity.ok(createdItem);
     }
 
-    @PatchMapping("/editItemTitle")
-    public ResponseEntity<ItemUpdateTitleResponse> updateItemTitle(
-            @Valid @RequestBody ItemUpdateTitleRequest itemUpdateRequest
+    @PutMapping
+    public ResponseEntity<ItemUpdateResponse> updateItem(
+            @Valid @RequestBody ItemUpdateRequest itemUpdateRequest
     ) {
-        ItemUpdateTitleResponse updatedItem = this.itemUpdateTitleOperation.process(itemUpdateRequest);
+        ItemUpdateResponse updatedItem = this.itemUpdateOperation.process(itemUpdateRequest);
 
         return ResponseEntity.ok(updatedItem);
     }
 
-    @PatchMapping("/editItemDescription")
-    public ResponseEntity<ItemUpdateDescriptionResponse> updateItemDescription(
-            @Valid @RequestBody ItemUpdateDescriptionRequest itemUpdateRequest
-    ) {
-        ItemUpdateDescriptionResponse updatedItem = this.itemUpdateDescriptionOperation.process(itemUpdateRequest);
-
-        return ResponseEntity.ok(updatedItem);
-    }
-
-    @PatchMapping("/archiveItem")
+    @PatchMapping("/archive")
     public ResponseEntity<ItemArchiveResponse> archiveItem(
             @Valid @RequestBody ItemArchiveRequest itemArchiveRequest
     ) {
@@ -128,7 +113,7 @@ public class ItemController {
         return ResponseEntity.ok(archivedItem);
     }
 
-    @PatchMapping("/unarchiveItem")
+    @PatchMapping("/unarchive")
     public ResponseEntity<ItemUnarchiveResponse> unarchiveItem(
             @Valid @RequestBody ItemUnarchiveRequest itemUnarchiveRequest
     ) {
@@ -137,7 +122,7 @@ public class ItemController {
         return ResponseEntity.ok(unarchivedItem);
     }
 
-    @PatchMapping("/addMultimediaToItem")
+    @PatchMapping("/addMultimedia")
     public ResponseEntity<ItemAddMultimediaResponse> addMultimediaToItem(
             @Valid @RequestBody ItemAddMultimediaRequest itemAddMultimediaRequest
     ) {
@@ -146,7 +131,7 @@ public class ItemController {
         return ResponseEntity.ok(item);
     }
 
-    @PatchMapping("/removeMultimediaFromItem")
+    @PatchMapping("/removeMultimedia")
     public ResponseEntity<ItemRemoveMultimediaResponse> removeMultimediaFromItem(
             @Valid @RequestBody ItemRemoveMultimediaRequest itemRemoveMultimediaRequest
     ) {
@@ -155,7 +140,7 @@ public class ItemController {
         return ResponseEntity.ok(item);
     }
 
-    @PatchMapping("/addTagToItem")
+    @PatchMapping("/addTag")
     public ResponseEntity<ItemAddTagResponse> addTagToItem(
             @Valid @RequestBody ItemAddTagRequest itemAddTagRequest
     ) {
@@ -164,7 +149,7 @@ public class ItemController {
         return ResponseEntity.ok(item);
     }
 
-    @PatchMapping("/removeTagFromItem")
+    @PatchMapping("/removeTag")
     public ResponseEntity<ItemRemoveTagResponse> removeTagFromItem(
             @Valid @RequestBody ItemRemoveTagRequest itemRemoveTagRequest
     ) {
