@@ -5,6 +5,7 @@ import com.tinqin.zoostore.api.operations.item.archive.ItemArchiveResponse;
 import com.tinqin.zoostore.api.operations.item.create.ItemCreateRequest;
 import com.tinqin.zoostore.api.operations.item.create.ItemCreateResponse;
 import com.tinqin.zoostore.api.operations.item.get.GetItemByIdResponse;
+import com.tinqin.zoostore.api.operations.item.getbytag.ItemGetByTagResponse;
 import com.tinqin.zoostore.api.operations.item.unarchive.ItemUnarchiveRequest;
 import com.tinqin.zoostore.api.operations.item.unarchive.ItemUnarchiveResponse;
 import com.tinqin.zoostore.api.operations.item.update.ItemUpdateRequest;
@@ -24,6 +25,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 @Headers({"Content-Type: application/json"})
 public interface ZooStoreRestClient {
+
+    @RequestLine("GET /api/zoostore/items?title={title}&pageNumber={pageNumber}&pageSize={pageSize}")
+    ItemGetByTagResponse getItemsByTagTitle(@Param String title, @Param Integer pageNumber, @Param Integer pageSize);
 
     @RequestLine("GET /api/zoostore/items/{id}")
     GetItemByIdResponse getItemById(@Param String id);

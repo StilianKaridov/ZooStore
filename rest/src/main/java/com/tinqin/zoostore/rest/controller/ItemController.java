@@ -9,7 +9,6 @@ import com.tinqin.zoostore.api.operations.item.create.ItemCreateResponse;
 import com.tinqin.zoostore.api.operations.item.get.GetItemByIdOperation;
 import com.tinqin.zoostore.api.operations.item.get.GetItemByIdRequest;
 import com.tinqin.zoostore.api.operations.item.get.GetItemByIdResponse;
-import com.tinqin.zoostore.api.operations.item.getbytag.ItemGetByTagDataResponse;
 import com.tinqin.zoostore.api.operations.item.getbytag.ItemGetByTagOperation;
 import com.tinqin.zoostore.api.operations.item.getbytag.ItemGetByTagRequest;
 import com.tinqin.zoostore.api.operations.item.getbytag.ItemGetByTagResponse;
@@ -32,11 +31,11 @@ import com.tinqin.zoostore.api.operations.itemtag.remove.ItemRemoveTagOperation;
 import com.tinqin.zoostore.api.operations.itemtag.remove.ItemRemoveTagRequest;
 import com.tinqin.zoostore.api.operations.itemtag.remove.ItemRemoveTagResponse;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -47,11 +46,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Collections;
-import java.util.List;
-
 @RestController
 @RequestMapping("/api/zoostore/items")
+@Validated
 public class ItemController {
 
     private final ItemCreateOperation itemCreateOperation;
@@ -88,21 +85,21 @@ public class ItemController {
     }
 
     @GetMapping
-    public ResponseEntity<Page<ItemGetByTagDataResponse>> getItemsByTagTitle(
-            @RequestParam String title,
-            @RequestParam Integer pageNumber,
-            @RequestParam Integer pageSize
+    public ResponseEntity<ItemGetByTagResponse> getItemsByTagTitle(
+            @RequestParam @NotBlank(message = "Title is required.") String title,
+            @RequestParam @Min(value = 1, message = "Page number must be positive number.") Integer pageNumber,
+            @RequestParam @Min(value = 1, message = "Page size must be positive number.") Integer pageSize
     ) {
         ItemGetByTagRequest itemRequest = ItemGetByTagRequest
                 .builder()
                 .tagTitle(title)
-                .pageNumber(pageNumber)
+                .pageNumber(pageNumber - 1)
                 .pageSize(pageSize)
                 .build();
 
         ItemGetByTagResponse response = this.itemGetByTagOperation.process(itemRequest);
 
-        return ResponseEntity.ok(new PageImpl<>(response.getItems()));
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/{id}")

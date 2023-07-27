@@ -10,14 +10,35 @@ import com.tinqin.zoostore.core.exception.item.NoSuchItemException;
 import com.tinqin.zoostore.core.exception.multimedia.MultimediaDoesntBelongItemException;
 import com.tinqin.zoostore.core.exception.tag.NoSuchTagException;
 import com.tinqin.zoostore.core.exception.vendor.NoSuchVendorException;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolationException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @RestControllerAdvice(assignableTypes = {ItemController.class})
 public class ItemControllerAdvice {
+
+    @ExceptionHandler(value = ConstraintViolationException.class)
+    public ResponseEntity<String> handlerConstraintViolationException(ConstraintViolationException ex) {
+        StringBuilder sb = new StringBuilder();
+
+        for (ConstraintViolation<?> cv : ex.getConstraintViolations()) {
+            sb.append(cv.getMessageTemplate()).append("\n");
+        }
+
+        return ResponseEntity.badRequest().body(sb.toString());
+    }
+
+    @ExceptionHandler(value = MissingServletRequestParameterException.class)
+    public ResponseEntity<String> handlerMissingRequestParameterException(MissingServletRequestParameterException ex) {
+        String errorMessage = ex.getParameterName() + " is required.";
+
+        return ResponseEntity.badRequest().body(errorMessage);
+    }
 
     @ExceptionHandler(value = MethodArgumentNotValidException.class)
     public ResponseEntity<String> handleNullOrEmptyFieldException(MethodArgumentNotValidException ex) {
