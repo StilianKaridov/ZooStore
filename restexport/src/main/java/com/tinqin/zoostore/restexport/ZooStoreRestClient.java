@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 @Headers({"Content-Type: application/json"})
 public interface ZooStoreRestClient {
 
-    @RequestLine("GET /{id}")
+    @RequestLine("GET /api/zoostore/items/{id}")
     GetItemByIdResponse getItemById(@Param String id);
 
     @RequestLine("POST /api/zoostore/items")
