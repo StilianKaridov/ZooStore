@@ -5,6 +5,7 @@ import com.tinqin.zoostore.api.operations.item.archive.ItemArchiveResponse;
 import com.tinqin.zoostore.api.operations.item.create.ItemCreateRequest;
 import com.tinqin.zoostore.api.operations.item.create.ItemCreateResponse;
 import com.tinqin.zoostore.api.operations.item.get.GetItemByIdResponse;
+import com.tinqin.zoostore.api.operations.item.getbytag.ItemGetByTagDataResponse;
 import com.tinqin.zoostore.api.operations.item.getbytag.ItemGetByTagResponse;
 import com.tinqin.zoostore.api.operations.item.unarchive.ItemUnarchiveRequest;
 import com.tinqin.zoostore.api.operations.item.unarchive.ItemUnarchiveResponse;
@@ -21,6 +22,7 @@ import com.tinqin.zoostore.api.operations.itemtag.remove.ItemRemoveTagResponse;
 import feign.Headers;
 import feign.Param;
 import feign.RequestLine;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.web.bind.annotation.RequestBody;
 
 @Headers({"Content-Type: application/json"})

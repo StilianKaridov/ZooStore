@@ -17,5 +17,11 @@ import java.util.List;
 @Builder
 public class ItemGetByTagResponse implements OperationResponse {
 
+    private Integer page;
+
+    private Integer limit;
+
+    private Long totalItems;
+
     private List<ItemGetByTagDataResponse> items;
 }
