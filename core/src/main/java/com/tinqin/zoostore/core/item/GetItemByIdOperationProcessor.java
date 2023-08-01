@@ -27,6 +27,10 @@ public class GetItemByIdOperationProcessor implements GetItemByIdOperation {
 
         Item item = itemRepository.getItemById(itemId).orElseThrow(NoSuchItemException::new);
 
+        if (item.getIsArchived()) {
+            throw new NoSuchItemException();
+        }
+
         return GetItemByIdResponse.builder().itemId(item.getId()).title(item.getTitle()).build();
     }
 }
