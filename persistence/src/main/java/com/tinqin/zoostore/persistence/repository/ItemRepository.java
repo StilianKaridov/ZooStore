@@ -20,4 +20,6 @@ public interface ItemRepository extends JpaRepository<Item, UUID> {
     Page<Item> findAllByTags_Title(String title, Pageable pageable);
 
     List<Item> findAllByIdIn(List<UUID> ids);
+
+    Page<Item> findAllByTitleContaining(String title, Pageable pageable);
 }

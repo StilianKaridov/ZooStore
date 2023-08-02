@@ -12,6 +12,9 @@ import com.tinqin.zoostore.api.operations.item.get.GetItemByIdResponse;
 import com.tinqin.zoostore.api.operations.item.getbytag.ItemGetByTagOperation;
 import com.tinqin.zoostore.api.operations.item.getbytag.ItemGetByTagRequest;
 import com.tinqin.zoostore.api.operations.item.getbytag.ItemGetByTagResponse;
+import com.tinqin.zoostore.api.operations.item.getbytitle.ItemGetByTitleOperation;
+import com.tinqin.zoostore.api.operations.item.getbytitle.ItemGetByTitleRequest;
+import com.tinqin.zoostore.api.operations.item.getbytitle.ItemGetByTitleResponse;
 import com.tinqin.zoostore.api.operations.item.getlistofitems.GetListOfItemsOperation;
 import com.tinqin.zoostore.api.operations.item.getlistofitems.GetListOfItemsRequest;
 import com.tinqin.zoostore.api.operations.item.getlistofitems.GetListOfItemsResponse;
@@ -65,6 +68,7 @@ public class ItemController {
     private final ItemUpdateOperation itemUpdateOperation;
     private final ItemGetByTagOperation itemGetByTagOperation;
     private final GetListOfItemsOperation getListOfItemsOperation;
+    private final ItemGetByTitleOperation itemGetByTitleOperation;
 
     @Autowired
     public ItemController(
@@ -75,7 +79,7 @@ public class ItemController {
             ItemRemoveMultimediaOperation itemRemoveMultimediaOperation,
             ItemAddTagOperation itemAddTagOperation,
             ItemRemoveTagOperation itemRemoveTagOperation,
-            GetItemByIdOperation getItemByIdOperation, ItemUpdateOperation itemUpdateOperation, ItemGetByTagOperation itemGetByTagOperation, GetListOfItemsOperation getListOfItemsOperation) {
+            GetItemByIdOperation getItemByIdOperation, ItemUpdateOperation itemUpdateOperation, ItemGetByTagOperation itemGetByTagOperation, GetListOfItemsOperation getListOfItemsOperation, ItemGetByTitleOperation itemGetByTitleOperation) {
         this.itemCreateOperation = itemCreateOperation;
         this.itemArchiveOperation = itemArchiveOperation;
         this.itemUnarchiveOperation = itemUnarchiveOperation;
@@ -87,22 +91,41 @@ public class ItemController {
         this.itemUpdateOperation = itemUpdateOperation;
         this.itemGetByTagOperation = itemGetByTagOperation;
         this.getListOfItemsOperation = getListOfItemsOperation;
+        this.itemGetByTitleOperation = itemGetByTitleOperation;
     }
 
-    @GetMapping
+    @GetMapping("/byTag")
     public ResponseEntity<ItemGetByTagResponse> getItemsByTagTitle(
             @RequestParam @NotBlank(message = "Title is required.") String title,
-            @RequestParam @Min(value = 1, message = "Page number must be positive number.") Integer pageNumber,
+            @RequestParam @Min(value = 0, message = "Page number must be greater than or equal to zero.") Integer pageNumber,
             @RequestParam @Min(value = 1, message = "Page size must be positive number.") Integer pageSize
     ) {
         ItemGetByTagRequest itemRequest = ItemGetByTagRequest
                 .builder()
                 .tagTitle(title)
-                .pageNumber(pageNumber - 1)
+                .pageNumber(pageNumber)
                 .pageSize(pageSize)
                 .build();
 
         ItemGetByTagResponse response = this.itemGetByTagOperation.process(itemRequest);
+
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/byItem")
+    public ResponseEntity<ItemGetByTitleResponse> getItemsByItemTitle(
+            @RequestParam @NotBlank(message = "Title is required.") String title,
+            @RequestParam @Min(value = 0, message = "Page number must be greater than or equal to zero.") Integer pageNumber,
+            @RequestParam @Min(value = 1, message = "Page size must be positive number.") Integer pageSize
+    ) {
+        ItemGetByTitleRequest itemRequest = ItemGetByTitleRequest
+                .builder()
+                .title(title)
+                .pageNumber(pageNumber)
+                .pageSize(pageSize)
+                .build();
+
+        ItemGetByTitleResponse response = this.itemGetByTitleOperation.process(itemRequest);
 
         return ResponseEntity.ok(response);
     }
