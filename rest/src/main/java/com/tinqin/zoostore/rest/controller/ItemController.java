@@ -9,10 +9,12 @@ import com.tinqin.zoostore.api.operations.item.create.ItemCreateResponse;
 import com.tinqin.zoostore.api.operations.item.get.GetItemByIdOperation;
 import com.tinqin.zoostore.api.operations.item.get.GetItemByIdRequest;
 import com.tinqin.zoostore.api.operations.item.get.GetItemByIdResponse;
-import com.tinqin.zoostore.api.operations.item.getbytag.ItemGetByTagDataResponse;
 import com.tinqin.zoostore.api.operations.item.getbytag.ItemGetByTagOperation;
 import com.tinqin.zoostore.api.operations.item.getbytag.ItemGetByTagRequest;
 import com.tinqin.zoostore.api.operations.item.getbytag.ItemGetByTagResponse;
+import com.tinqin.zoostore.api.operations.item.getlistofitems.GetListOfItemsOperation;
+import com.tinqin.zoostore.api.operations.item.getlistofitems.GetListOfItemsRequest;
+import com.tinqin.zoostore.api.operations.item.getlistofitems.GetListOfItemsResponse;
 import com.tinqin.zoostore.api.operations.item.unarchive.ItemUnarchiveOperation;
 import com.tinqin.zoostore.api.operations.item.unarchive.ItemUnarchiveRequest;
 import com.tinqin.zoostore.api.operations.item.unarchive.ItemUnarchiveResponse;
@@ -35,9 +37,6 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -65,6 +64,7 @@ public class ItemController {
     private final GetItemByIdOperation getItemByIdOperation;
     private final ItemUpdateOperation itemUpdateOperation;
     private final ItemGetByTagOperation itemGetByTagOperation;
+    private final GetListOfItemsOperation getListOfItemsOperation;
 
     @Autowired
     public ItemController(
@@ -75,7 +75,7 @@ public class ItemController {
             ItemRemoveMultimediaOperation itemRemoveMultimediaOperation,
             ItemAddTagOperation itemAddTagOperation,
             ItemRemoveTagOperation itemRemoveTagOperation,
-            GetItemByIdOperation getItemByIdOperation, ItemUpdateOperation itemUpdateOperation, ItemGetByTagOperation itemGetByTagOperation) {
+            GetItemByIdOperation getItemByIdOperation, ItemUpdateOperation itemUpdateOperation, ItemGetByTagOperation itemGetByTagOperation, GetListOfItemsOperation getListOfItemsOperation) {
         this.itemCreateOperation = itemCreateOperation;
         this.itemArchiveOperation = itemArchiveOperation;
         this.itemUnarchiveOperation = itemUnarchiveOperation;
@@ -86,6 +86,7 @@ public class ItemController {
         this.getItemByIdOperation = getItemByIdOperation;
         this.itemUpdateOperation = itemUpdateOperation;
         this.itemGetByTagOperation = itemGetByTagOperation;
+        this.getListOfItemsOperation = getListOfItemsOperation;
     }
 
     @GetMapping
@@ -114,6 +115,15 @@ public class ItemController {
                 .build();
 
         GetItemByIdResponse response = this.getItemByIdOperation.process(itemRequest);
+
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/list")
+    public ResponseEntity<GetListOfItemsResponse> getListOfItemsByIds(
+            @RequestBody GetListOfItemsRequest getListOfItemsRequest
+    ) {
+        GetListOfItemsResponse response = this.getListOfItemsOperation.process(getListOfItemsRequest);
 
         return ResponseEntity.ok(response);
     }
