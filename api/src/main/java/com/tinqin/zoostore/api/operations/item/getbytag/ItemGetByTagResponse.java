@@ -23,5 +23,5 @@ public class ItemGetByTagResponse implements OperationResponse {
 
     private Long totalItems;
 
-    private List<ItemGetByTagDataResponse> items;
+    private List<ItemGetDataResponse> items;
 }

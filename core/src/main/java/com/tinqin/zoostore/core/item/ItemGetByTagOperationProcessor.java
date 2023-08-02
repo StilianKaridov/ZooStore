@@ -1,6 +1,6 @@
 package com.tinqin.zoostore.core.item;
 
-import com.tinqin.zoostore.api.operations.item.getbytag.ItemGetByTagDataResponse;
+import com.tinqin.zoostore.api.operations.item.getbytag.ItemGetDataResponse;
 import com.tinqin.zoostore.api.operations.item.getbytag.ItemGetByTagOperation;
 import com.tinqin.zoostore.api.operations.item.getbytag.ItemGetByTagRequest;
 import com.tinqin.zoostore.api.operations.item.getbytag.ItemGetByTagResponse;
@@ -8,8 +8,6 @@ import com.tinqin.zoostore.api.operations.item.getbytag.MultimediaGetResponse;
 import com.tinqin.zoostore.api.operations.item.getbytag.TagGetResponse;
 import com.tinqin.zoostore.api.operations.item.getbytag.VendorGetResponse;
 import com.tinqin.zoostore.persistence.entity.Item;
-import com.tinqin.zoostore.persistence.entity.Multimedia;
-import com.tinqin.zoostore.persistence.entity.Tag;
 import com.tinqin.zoostore.persistence.entity.Vendor;
 import com.tinqin.zoostore.persistence.repository.ItemRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,7 +38,7 @@ public class ItemGetByTagOperationProcessor implements ItemGetByTagOperation {
 
         Page<Item> items = this.itemRepository.findAllByTags_Title(input.getTagTitle(), pageable);
 
-        List<ItemGetByTagDataResponse> mappedItems = new ArrayList<>();
+        List<ItemGetDataResponse> mappedItems = new ArrayList<>();
 
         for (Item i : items) {
 
@@ -65,7 +63,7 @@ public class ItemGetByTagOperationProcessor implements ItemGetByTagOperation {
                     .build();
 
             mappedItems.add(
-                    ItemGetByTagDataResponse
+                    ItemGetDataResponse
                             .builder()
                             .id(String.valueOf(i.getId()))
                             .title(i.getTitle())
