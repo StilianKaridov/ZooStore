@@ -1,11 +1,11 @@
 package com.tinqin.zoostore.core.itemtag;
 
-import com.tinqin.zoostore.core.exception.item.NoSuchItemException;
-import com.tinqin.zoostore.core.exception.tag.NoSuchTagException;
-import com.tinqin.zoostore.core.exception.tag.TagDoesntBelongToItemException;
 import com.tinqin.zoostore.api.operations.itemtag.remove.ItemRemoveTagOperation;
 import com.tinqin.zoostore.api.operations.itemtag.remove.ItemRemoveTagRequest;
 import com.tinqin.zoostore.api.operations.itemtag.remove.ItemRemoveTagResponse;
+import com.tinqin.zoostore.core.exception.item.NoSuchItemException;
+import com.tinqin.zoostore.core.exception.tag.NoSuchTagException;
+import com.tinqin.zoostore.core.exception.tag.TagDoesntBelongToItemException;
 import com.tinqin.zoostore.persistence.entity.Item;
 import com.tinqin.zoostore.persistence.entity.Tag;
 import com.tinqin.zoostore.persistence.repository.ItemRepository;
@@ -38,17 +38,18 @@ public class ItemRemoveTagOperationProcessor implements ItemRemoveTagOperation {
                 findById(id).
                 orElseThrow(NoSuchItemException::new);
 
-        for (String currentId : input.getTagsId()) {
-            UUID tagId = UUID.fromString(currentId);
+        input.getTagsId()
+                .forEach(
+                        currentId -> {
+                            UUID tagId = UUID.fromString(currentId);
+                            Tag tag = this.tagRepository
+                                    .findById(tagId)
+                                    .orElseThrow(NoSuchTagException::new);
 
-            Tag tag = this.tagRepository.
-                    findById(tagId).
-                    orElseThrow(NoSuchTagException::new);
-
-            if (!item.getTags().remove(tag)) {
-                throw new TagDoesntBelongToItemException(currentId);
-            }
-        }
+                            if (!item.getTags().remove(tag)) {
+                                throw new TagDoesntBelongToItemException(currentId);
+                            }
+                        });
 
         this.itemRepository.save(item);
 

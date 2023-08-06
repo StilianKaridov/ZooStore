@@ -1,10 +1,10 @@
 package com.tinqin.zoostore.core.itemtag;
 
-import com.tinqin.zoostore.core.exception.item.NoSuchItemException;
-import com.tinqin.zoostore.core.exception.tag.NoSuchTagException;
 import com.tinqin.zoostore.api.operations.itemtag.add.ItemAddTagOperation;
 import com.tinqin.zoostore.api.operations.itemtag.add.ItemAddTagRequest;
 import com.tinqin.zoostore.api.operations.itemtag.add.ItemAddTagResponse;
+import com.tinqin.zoostore.core.exception.item.NoSuchItemException;
+import com.tinqin.zoostore.core.exception.tag.NoSuchTagException;
 import com.tinqin.zoostore.persistence.entity.Item;
 import com.tinqin.zoostore.persistence.entity.Tag;
 import com.tinqin.zoostore.persistence.repository.ItemRepository;
@@ -40,15 +40,14 @@ public class ItemAddTagOperationProcessor implements ItemAddTagOperation {
 
         Set<Tag> toAddToItem = item.getTags();
 
-        for (String currentId : input.getTagsId()) {
-            UUID tagId = UUID.fromString(currentId);
-
-            Tag tag = this.tagRepository.
-                    findById(tagId).
-                    orElseThrow(NoSuchTagException::new);
-
-            toAddToItem.add(tag);
-        }
+        input.getTagsId()
+                .stream()
+                .map(UUID::fromString)
+                .map(
+                        tagId -> this.tagRepository
+                                .findById(tagId)
+                                .orElseThrow(NoSuchTagException::new)
+                ).forEach(toAddToItem::add);
 
         Item itemWithUpdatedTags = Item
                 .builder()

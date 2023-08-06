@@ -39,7 +39,6 @@ public class ItemCreateOperationProcessor implements ItemCreateOperation {
         }
 
         UUID id = UUID.fromString(input.getVendorId());
-
         Vendor vendor = this.vendorRepository
                 .findById(id)
                 .orElseThrow(NoSuchVendorException::new);
@@ -51,7 +50,6 @@ public class ItemCreateOperationProcessor implements ItemCreateOperation {
                 .isArchived(Boolean.FALSE)
                 .vendor(vendor)
                 .build();
-
         this.itemRepository.save(item);
 
         return this.modelMapper.map(item, ItemCreateResponse.class);

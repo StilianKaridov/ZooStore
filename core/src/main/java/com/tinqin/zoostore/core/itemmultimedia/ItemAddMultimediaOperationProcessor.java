@@ -1,10 +1,10 @@
 package com.tinqin.zoostore.core.itemmultimedia;
 
-import com.tinqin.zoostore.core.exception.item.NoSuchItemException;
-import com.tinqin.zoostore.core.exception.multimedia.NoSuchMultimediaException;
 import com.tinqin.zoostore.api.operations.itemmultimedia.add.ItemAddMultimediaOperation;
 import com.tinqin.zoostore.api.operations.itemmultimedia.add.ItemAddMultimediaRequest;
 import com.tinqin.zoostore.api.operations.itemmultimedia.add.ItemAddMultimediaResponse;
+import com.tinqin.zoostore.core.exception.item.NoSuchItemException;
+import com.tinqin.zoostore.core.exception.multimedia.NoSuchMultimediaException;
 import com.tinqin.zoostore.persistence.entity.Item;
 import com.tinqin.zoostore.persistence.entity.Multimedia;
 import com.tinqin.zoostore.persistence.repository.ItemRepository;
@@ -40,15 +40,14 @@ public class ItemAddMultimediaOperationProcessor implements ItemAddMultimediaOpe
 
         Set<Multimedia> toAddToItem = item.getMultimedia();
 
-        for (String currentId : input.getMultimediaId()) {
-            UUID multimediaId = UUID.fromString(currentId);
-
-            Multimedia multimedia = this.multimediaRepository.
-                    findById(multimediaId).
-                    orElseThrow(NoSuchMultimediaException::new);
-
-            toAddToItem.add(multimedia);
-        }
+        input.getMultimediaId()
+                .stream()
+                .map(UUID::fromString)
+                .map(
+                        multimediaId -> this.multimediaRepository
+                                .findById(multimediaId)
+                                .orElseThrow(NoSuchMultimediaException::new)
+                ).forEach(toAddToItem::add);
 
         Item itemWithAddedMultimedia = Item
                 .builder()

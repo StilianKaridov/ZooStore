@@ -25,12 +25,18 @@ public class GetItemByIdOperationProcessor implements GetItemByIdOperation {
     public GetItemByIdResponse process(GetItemByIdRequest input) {
         UUID itemId = UUID.fromString(input.getId());
 
-        Item item = itemRepository.getItemById(itemId).orElseThrow(NoSuchItemException::new);
+        Item item = this.itemRepository
+                .getItemById(itemId)
+                .orElseThrow(NoSuchItemException::new);
 
         if (item.getIsArchived()) {
             throw new NoSuchItemException();
         }
 
-        return GetItemByIdResponse.builder().itemId(item.getId()).title(item.getTitle()).build();
+        return GetItemByIdResponse
+                .builder()
+                .itemId(item.getId())
+                .title(item.getTitle())
+                .build();
     }
 }

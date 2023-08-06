@@ -41,16 +41,24 @@ public class ItemGetByTitleOperationProcessor implements ItemGetByTitleOperation
 
         for (Item i : items) {
 
-            Set<MultimediaGetResponse> multimedia = i.getMultimedia().stream().map(m -> MultimediaGetResponse
-                    .builder()
-                    .url(m.getUrl())
-                    .build()).collect(Collectors.toSet());
+            Set<MultimediaGetResponse> multimedia = i.getMultimedia()
+                    .stream()
+                    .map(
+                            m -> MultimediaGetResponse
+                                    .builder()
+                                    .url(m.getUrl())
+                                    .build()
+                    ).collect(Collectors.toSet());
 
-            Set<TagGetResponse> tags = i.getTags().stream().map(t -> TagGetResponse
-                    .builder()
-                    .id(String.valueOf(t.getId()))
-                    .title(t.getTitle())
-                    .build()).collect(Collectors.toSet());
+            Set<TagGetResponse> tags = i.getTags()
+                    .stream()
+                    .map(
+                            t -> TagGetResponse
+                                    .builder()
+                                    .id(String.valueOf(t.getId()))
+                                    .title(t.getTitle())
+                                    .build()
+                    ).collect(Collectors.toSet());
 
             Vendor vendor = i.getVendor();
 
