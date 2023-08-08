@@ -5,6 +5,7 @@ import com.tinqin.zoostore.api.operations.vendor.update.VendorUpdateRequest;
 import com.tinqin.zoostore.api.operations.vendor.update.VendorUpdateResponse;
 import com.tinqin.zoostore.core.exception.vendor.InvalidPhoneNumberFormatException;
 import com.tinqin.zoostore.core.exception.vendor.NoSuchVendorException;
+import com.tinqin.zoostore.core.exception.vendor.VendorAlreadyExistingException;
 import com.tinqin.zoostore.persistence.entity.Vendor;
 import com.tinqin.zoostore.persistence.repository.VendorRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,7 +34,14 @@ public class VendorUpdateOperationProcessor implements VendorUpdateOperation {
                 .orElseThrow(NoSuchVendorException::new);
 
         Optional<String> nameOpt = input.getName();
-        nameOpt.ifPresent(vendor::setName);
+
+        nameOpt.ifPresent(vendorName -> {
+            this.vendorRepository.findFirstByName(vendorName).ifPresent(value -> {
+                throw new VendorAlreadyExistingException();
+            });
+
+            vendor.setName(vendorName);
+        });
 
         Optional<String> phoneNumberOpt = input.getPhoneNumber();
 
