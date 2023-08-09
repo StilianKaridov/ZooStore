@@ -35,7 +35,7 @@ public class ItemGetByTitleOperationProcessor implements ItemGetByTitleOperation
     public ItemGetByTitleResponse process(ItemGetByTitleRequest input) {
         Pageable pageable = PageRequest.of(input.getPageNumber(), input.getPageSize());
 
-        Page<Item> items = this.itemRepository.findAllByTitleContaining(input.getTitle(), pageable);
+        Page<Item> items = this.itemRepository.findAllByPartialTitle(input.getTitle(), pageable);
 
         List<ItemGetDataResponse> mappedItems = new ArrayList<>();
 
