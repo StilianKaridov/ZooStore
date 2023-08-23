@@ -12,6 +12,10 @@ import com.tinqin.zoostore.api.operations.tag.unarchive.TagUnarchiveResponse;
 import com.tinqin.zoostore.api.operations.tag.update.TagUpdateOperation;
 import com.tinqin.zoostore.api.operations.tag.update.TagUpdateRequest;
 import com.tinqin.zoostore.api.operations.tag.update.TagUpdateResponse;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -43,7 +47,15 @@ public class TagController {
         this.tagUnarchiveOperation = tagUnarchiveOperation;
     }
 
-
+    @Operation(description = "Creates tag with title.",
+            summary = "Creates tag.")
+    @ApiResponse(responseCode = "201", description = "Successfully created tag.")
+    @ApiResponse(responseCode = "400",
+            description = "Tag exists.",
+            content = {@Content(examples = @ExampleObject(value = "This title is occupied. Please, choose a new title!"), mediaType = "text/html")})
+    @ApiResponse(responseCode = "400",
+            description = "Title must not be blank.",
+            content = {@Content(examples = @ExampleObject(value = "The title must not be empty!"), mediaType = "text/html")})
     @PostMapping
     public ResponseEntity<TagCreateResponse> createTag(
             @Valid @RequestBody TagCreateRequest tagCreateRequest
@@ -55,6 +67,18 @@ public class TagController {
                 body(tagResponse);
     }
 
+    @Operation(description = "Updates tag title.",
+            summary = "Updates tag.")
+    @ApiResponse(responseCode = "200", description = "Successfully updated tag title.")
+    @ApiResponse(responseCode = "400",
+            description = "Tag exists.",
+            content = {@Content(examples = @ExampleObject(value = "This title is occupied. Please, choose a new title!"), mediaType = "text/html")})
+    @ApiResponse(responseCode = "400",
+            description = "Tag does not exist.",
+            content = {@Content(examples = @ExampleObject(value = "This tag does not exist!"), mediaType = "text/html")})
+    @ApiResponse(responseCode = "400",
+            description = "Old title and new title must not be blank.",
+            content = {@Content(examples = @ExampleObject(value = "The title must not be empty!"), mediaType = "text/html")})
     @PatchMapping("/update")
     public ResponseEntity<TagUpdateResponse> updateTag(
             @Valid @RequestBody TagUpdateRequest tagUpdateRequest
@@ -64,6 +88,18 @@ public class TagController {
         return ResponseEntity.ok(updatedTag);
     }
 
+    @Operation(description = "Archives tag.",
+            summary = "Archives tag.")
+    @ApiResponse(responseCode = "200", description = "Successfully archived tag.")
+    @ApiResponse(responseCode = "400",
+            description = "Tag already archived.",
+            content = {@Content(examples = @ExampleObject(value = "Tag is already archived!"), mediaType = "text/html")})
+    @ApiResponse(responseCode = "400",
+            description = "Tag does not exist.",
+            content = {@Content(examples = @ExampleObject(value = "This tag does not exist!"), mediaType = "text/html")})
+    @ApiResponse(responseCode = "400",
+            description = "Title must not be blank.",
+            content = {@Content(examples = @ExampleObject(value = "The title must not be empty!"), mediaType = "text/html")})
     @PatchMapping("/archive")
     public ResponseEntity<TagArchiveResponse> archiveTag(
             @Valid @RequestBody TagArchiveRequest tagArchiveRequest
@@ -73,6 +109,18 @@ public class TagController {
         return ResponseEntity.ok(archivedTag);
     }
 
+    @Operation(description = "Unarchive tag.",
+            summary = "Unarchive tag.")
+    @ApiResponse(responseCode = "200", description = "Successfully unarchived tag.")
+    @ApiResponse(responseCode = "400",
+            description = "Tag already unarchived.",
+            content = {@Content(examples = @ExampleObject(value = "Tag is already unarchived!"), mediaType = "text/html")})
+    @ApiResponse(responseCode = "400",
+            description = "Tag does not exist.",
+            content = {@Content(examples = @ExampleObject(value = "This tag does not exist!"), mediaType = "text/html")})
+    @ApiResponse(responseCode = "400",
+            description = "Title must not be blank.",
+            content = {@Content(examples = @ExampleObject(value = "The title must not be empty!"), mediaType = "text/html")})
     @PatchMapping("/unarchive")
     public ResponseEntity<TagUnarchiveResponse> unarchiveTag(
             @Valid @RequestBody TagUnarchiveRequest tagUnarchiveRequest
