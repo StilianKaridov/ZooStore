@@ -36,6 +36,10 @@ import com.tinqin.zoostore.api.operations.itemtag.add.ItemAddTagResponse;
 import com.tinqin.zoostore.api.operations.itemtag.remove.ItemRemoveTagOperation;
 import com.tinqin.zoostore.api.operations.itemtag.remove.ItemRemoveTagRequest;
 import com.tinqin.zoostore.api.operations.itemtag.remove.ItemRemoveTagResponse;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
@@ -94,6 +98,18 @@ public class ItemController {
         this.itemGetByTitleOperation = itemGetByTitleOperation;
     }
 
+    @Operation(description = "Gets items by having the specified tag title. Paginates the result.",
+            summary = "Gets items by tag title.")
+    @ApiResponse(responseCode = "200", description = "Items found.")
+    @ApiResponse(responseCode = "400",
+            description = "Title must not be blank.",
+            content = {@Content(examples = @ExampleObject(value = "Title is required."), mediaType = "text/html")})
+    @ApiResponse(responseCode = "400",
+            description = "Invalid page number.",
+            content = {@Content(examples = @ExampleObject(value = "Page number must be greater than or equal to zero."), mediaType = "text/html")})
+    @ApiResponse(responseCode = "400",
+            description = "Invalid page size.",
+            content = {@Content(examples = @ExampleObject(value = "Page size must be positive number."), mediaType = "text/html")})
     @GetMapping("/byTag")
     public ResponseEntity<ItemGetByTagResponse> getItemsByTagTitle(
             @RequestParam @NotBlank(message = "Title is required.") String title,
@@ -112,6 +128,18 @@ public class ItemController {
         return ResponseEntity.ok(response);
     }
 
+    @Operation(description = "Gets items by having the specified item title. Paginates the result.",
+            summary = "Gets items by item title.")
+    @ApiResponse(responseCode = "200", description = "Items found.")
+    @ApiResponse(responseCode = "400",
+            description = "Title must not be blank.",
+            content = {@Content(examples = @ExampleObject(value = "Title is required."), mediaType = "text/html")})
+    @ApiResponse(responseCode = "400",
+            description = "Invalid page number.",
+            content = {@Content(examples = @ExampleObject(value = "Page number must be greater than or equal to zero."), mediaType = "text/html")})
+    @ApiResponse(responseCode = "400",
+            description = "Invalid page size.",
+            content = {@Content(examples = @ExampleObject(value = "Page size must be positive number."), mediaType = "text/html")})
     @GetMapping("/byItem")
     public ResponseEntity<ItemGetByTitleResponse> getItemsByItemTitle(
             @RequestParam @NotBlank(message = "Title is required.") String title,
@@ -130,6 +158,15 @@ public class ItemController {
         return ResponseEntity.ok(response);
     }
 
+    @Operation(description = "Gets item by having the specified id.",
+            summary = "Gets item by id.")
+    @ApiResponse(responseCode = "200", description = "Item found.")
+    @ApiResponse(responseCode = "400",
+            description = "Item does not exist.",
+            content = {@Content(examples = @ExampleObject(value = "No such item!"), mediaType = "text/html")})
+    @ApiResponse(responseCode = "400",
+            description = "Item is archived.",
+            content = {@Content(examples = @ExampleObject(value = "No such item!"), mediaType = "text/html")})
     @GetMapping("/{id}")
     public ResponseEntity<GetItemByIdResponse> getItemById(@PathVariable String id) {
         GetItemByIdRequest itemRequest = GetItemByIdRequest
@@ -142,6 +179,9 @@ public class ItemController {
         return ResponseEntity.ok(response);
     }
 
+    @Operation(description = "Gets list of items by multiple ids.",
+            summary = "Gets list of items.")
+    @ApiResponse(responseCode = "200", description = "Items found.")
     @PostMapping("/list")
     public ResponseEntity<GetListOfItemsResponse> getListOfItemsByIds(
             @RequestBody GetListOfItemsRequest getListOfItemsRequest
@@ -151,15 +191,45 @@ public class ItemController {
         return ResponseEntity.ok(response);
     }
 
+    @Operation(description = "Creates item with title, description and vendorId.",
+            summary = "Creates item.")
+    @ApiResponse(responseCode = "201", description = "Item created.")
+    @ApiResponse(responseCode = "400",
+            description = "Empty title parameter.",
+            content = {@Content(examples = @ExampleObject(value = "The title must not be empty!"), mediaType = "text/html")})
+    @ApiResponse(responseCode = "400",
+            description = "Empty description parameter.",
+            content = {@Content(examples = @ExampleObject(value = "The description must not be empty!"), mediaType = "text/html")})
+    @ApiResponse(responseCode = "400",
+            description = "Invalid UUID format.",
+            content = {@Content(examples = @ExampleObject(value = "Invalid UUID format!"), mediaType = "text/html")})
+    @ApiResponse(responseCode = "400",
+            description = "Empty vendorId parameter.",
+            content = {@Content(examples = @ExampleObject(value = "The vendorId must not be empty!"), mediaType = "text/html")})
+    @ApiResponse(responseCode = "400",
+            description = "Existing item creation.",
+            content = {@Content(examples = @ExampleObject(value = "Item with that title is already existing!"), mediaType = "text/html")})
+    @ApiResponse(responseCode = "404",
+            description = "Vendor with that id does not exist.",
+            content = {@Content(examples = @ExampleObject(value = "This vendor does not exist!"), mediaType = "text/html")})
     @PostMapping
     public ResponseEntity<ItemCreateResponse> createItem(
             @Valid @RequestBody ItemCreateRequest itemCreateRequest
     ) {
         ItemCreateResponse createdItem = this.itemCreateOperation.process(itemCreateRequest);
 
-        return ResponseEntity.ok(createdItem);
+        return ResponseEntity.status(201).body(createdItem);
     }
 
+    @Operation(description = "Updates item title/description.",
+            summary = "Updates item title/description.")
+    @ApiResponse(responseCode = "200", description = "Item updated.")
+    @ApiResponse(responseCode = "400",
+            description = "Empty item id parameter.",
+            content = {@Content(examples = @ExampleObject(value = "Item id must not be empty!"), mediaType = "text/html")})
+    @ApiResponse(responseCode = "400",
+            description = "Not existing item.",
+            content = {@Content(examples = @ExampleObject(value = "No such item!"), mediaType = "text/html")})
     @PutMapping
     public ResponseEntity<ItemUpdateResponse> updateItem(
             @Valid @RequestBody ItemUpdateRequest itemUpdateRequest
@@ -169,6 +239,21 @@ public class ItemController {
         return ResponseEntity.ok(updatedItem);
     }
 
+    @Operation(description = "Archives item by the specific item id.",
+            summary = "Archives item.")
+    @ApiResponse(responseCode = "200", description = "Item archived.")
+    @ApiResponse(responseCode = "400",
+            description = "Empty id parameter.",
+            content = {@Content(examples = @ExampleObject(value = "The id must not be empty!"), mediaType = "text/html")})
+    @ApiResponse(responseCode = "400",
+            description = "Invalid UUID format.",
+            content = {@Content(examples = @ExampleObject(value = "Invalid UUID format!"), mediaType = "text/html")})
+    @ApiResponse(responseCode = "400",
+            description = "Not existing item.",
+            content = {@Content(examples = @ExampleObject(value = "No such item!"), mediaType = "text/html")})
+    @ApiResponse(responseCode = "400",
+            description = "Trying to archive an already archived item.",
+            content = {@Content(examples = @ExampleObject(value = "Item is already archived!"), mediaType = "text/html")})
     @PatchMapping("/archive")
     public ResponseEntity<ItemArchiveResponse> archiveItem(
             @Valid @RequestBody ItemArchiveRequest itemArchiveRequest
@@ -178,6 +263,21 @@ public class ItemController {
         return ResponseEntity.ok(archivedItem);
     }
 
+    @Operation(description = "Unarchive item by the specific item id.",
+            summary = "Unarchive item.")
+    @ApiResponse(responseCode = "200", description = "Item unarchived.")
+    @ApiResponse(responseCode = "400",
+            description = "Empty id parameter.",
+            content = {@Content(examples = @ExampleObject(value = "The id must not be empty!"), mediaType = "text/html")})
+    @ApiResponse(responseCode = "400",
+            description = "Invalid UUID format.",
+            content = {@Content(examples = @ExampleObject(value = "Invalid UUID format!"), mediaType = "text/html")})
+    @ApiResponse(responseCode = "400",
+            description = "Not existing item.",
+            content = {@Content(examples = @ExampleObject(value = "No such item!"), mediaType = "text/html")})
+    @ApiResponse(responseCode = "400",
+            description = "Trying to unarchive an already unarchived item.",
+            content = {@Content(examples = @ExampleObject(value = "Item is already unarchived!"), mediaType = "text/html")})
     @PatchMapping("/unarchive")
     public ResponseEntity<ItemUnarchiveResponse> unarchiveItem(
             @Valid @RequestBody ItemUnarchiveRequest itemUnarchiveRequest
@@ -187,6 +287,27 @@ public class ItemController {
         return ResponseEntity.ok(unarchivedItem);
     }
 
+    @Operation(description = "Adds multimedia to the specific item.",
+            summary = "Adds multimedia to item.")
+    @ApiResponse(responseCode = "200", description = "Multimedia added to item successfully.")
+    @ApiResponse(responseCode = "400",
+            description = "Empty id parameter.",
+            content = {@Content(examples = @ExampleObject(value = "The id must not be empty!"), mediaType = "text/html")})
+    @ApiResponse(responseCode = "400",
+            description = "Invalid UUID format.",
+            content = {@Content(examples = @ExampleObject(value = "Invalid UUID format!"), mediaType = "text/html")})
+    @ApiResponse(responseCode = "400",
+            description = "Empty collection of ids.",
+            content = {@Content(examples = @ExampleObject(value = "The multimediaId must not be empty!"), mediaType = "text/html")})
+    @ApiResponse(responseCode = "400",
+            description = "Invalid UUID format in the collection.",
+            content = {@Content(examples = @ExampleObject(value = "Invalid UUID in the collection!"), mediaType = "text/html")})
+    @ApiResponse(responseCode = "400",
+            description = "Item does not exist.",
+            content = {@Content(examples = @ExampleObject(value = "No such item!"), mediaType = "text/html")})
+    @ApiResponse(responseCode = "404",
+            description = "Multimedia does not exist.",
+            content = {@Content(examples = @ExampleObject(value = "No multimedia with that public ID!"), mediaType = "text/html")})
     @PatchMapping("/addMultimedia")
     public ResponseEntity<ItemAddMultimediaResponse> addMultimediaToItem(
             @Valid @RequestBody ItemAddMultimediaRequest itemAddMultimediaRequest
@@ -196,6 +317,30 @@ public class ItemController {
         return ResponseEntity.ok(item);
     }
 
+    @Operation(description = "Removes multimedia from the specific item.",
+            summary = "Removes multimedia from item.")
+    @ApiResponse(responseCode = "200", description = "Multimedia removed from item successfully.")
+    @ApiResponse(responseCode = "400",
+            description = "Empty id parameter.",
+            content = {@Content(examples = @ExampleObject(value = "The id must not be empty!"), mediaType = "text/html")})
+    @ApiResponse(responseCode = "400",
+            description = "Invalid UUID format.",
+            content = {@Content(examples = @ExampleObject(value = "Invalid UUID format!"), mediaType = "text/html")})
+    @ApiResponse(responseCode = "400",
+            description = "Empty collection of ids.",
+            content = {@Content(examples = @ExampleObject(value = "The multimediaId must not be empty!"), mediaType = "text/html")})
+    @ApiResponse(responseCode = "400",
+            description = "Invalid UUID format in the collection.",
+            content = {@Content(examples = @ExampleObject(value = "Invalid UUID in the collection!"), mediaType = "text/html")})
+    @ApiResponse(responseCode = "400",
+            description = "Item does not exist.",
+            content = {@Content(examples = @ExampleObject(value = "No such item!"), mediaType = "text/html")})
+    @ApiResponse(responseCode = "404",
+            description = "Multimedia does not exist.",
+            content = {@Content(examples = @ExampleObject(value = "No multimedia with that public ID!"), mediaType = "text/html")})
+    @ApiResponse(responseCode = "400",
+            description = "Multimedia doesn't belong to this item.",
+            content = {@Content(examples = @ExampleObject(value = "Multimedia with ID: 'multimediaId' doesn't belong to this item!"), mediaType = "text/html")})
     @PatchMapping("/removeMultimedia")
     public ResponseEntity<ItemRemoveMultimediaResponse> removeMultimediaFromItem(
             @Valid @RequestBody ItemRemoveMultimediaRequest itemRemoveMultimediaRequest
@@ -205,6 +350,27 @@ public class ItemController {
         return ResponseEntity.ok(item);
     }
 
+    @Operation(description = "Adds tag to the specific item.",
+            summary = "Adds tag to item.")
+    @ApiResponse(responseCode = "200", description = "Tag added to item successfully.")
+    @ApiResponse(responseCode = "400",
+            description = "Empty id parameter.",
+            content = {@Content(examples = @ExampleObject(value = "The id must not be empty!"), mediaType = "text/html")})
+    @ApiResponse(responseCode = "400",
+            description = "Invalid UUID format.",
+            content = {@Content(examples = @ExampleObject(value = "Invalid UUID format!"), mediaType = "text/html")})
+    @ApiResponse(responseCode = "400",
+            description = "Empty collection of ids.",
+            content = {@Content(examples = @ExampleObject(value = "The tagsId must not be empty!"), mediaType = "text/html")})
+    @ApiResponse(responseCode = "400",
+            description = "Invalid UUID format in the collection.",
+            content = {@Content(examples = @ExampleObject(value = "Invalid UUID in the collection!"), mediaType = "text/html")})
+    @ApiResponse(responseCode = "400",
+            description = "Item does not exist.",
+            content = {@Content(examples = @ExampleObject(value = "No such item!"), mediaType = "text/html")})
+    @ApiResponse(responseCode = "404",
+            description = "Tag does not exist.",
+            content = {@Content(examples = @ExampleObject(value = "This tag does not exist!"), mediaType = "text/html")})
     @PatchMapping("/addTag")
     public ResponseEntity<ItemAddTagResponse> addTagToItem(
             @Valid @RequestBody ItemAddTagRequest itemAddTagRequest
@@ -214,6 +380,30 @@ public class ItemController {
         return ResponseEntity.ok(item);
     }
 
+    @Operation(description = "Removes tag from the specific item.",
+            summary = "Removes tag from item.")
+    @ApiResponse(responseCode = "200", description = "Tag removed from item successfully.")
+    @ApiResponse(responseCode = "400",
+            description = "Empty id parameter.",
+            content = {@Content(examples = @ExampleObject(value = "The id must not be empty!"), mediaType = "text/html")})
+    @ApiResponse(responseCode = "400",
+            description = "Invalid UUID format.",
+            content = {@Content(examples = @ExampleObject(value = "Invalid UUID format!"), mediaType = "text/html")})
+    @ApiResponse(responseCode = "400",
+            description = "Empty collection of ids.",
+            content = {@Content(examples = @ExampleObject(value = "The tagsId must not be empty!"), mediaType = "text/html")})
+    @ApiResponse(responseCode = "400",
+            description = "Invalid UUID format in the collection.",
+            content = {@Content(examples = @ExampleObject(value = "Invalid UUID in the collection!"), mediaType = "text/html")})
+    @ApiResponse(responseCode = "400",
+            description = "Item does not exist.",
+            content = {@Content(examples = @ExampleObject(value = "No such item!"), mediaType = "text/html")})
+    @ApiResponse(responseCode = "404",
+            description = "Tag does not exist.",
+            content = {@Content(examples = @ExampleObject(value = "This tag does not exist!"), mediaType = "text/html")})
+    @ApiResponse(responseCode = "400",
+            description = "Tag doesn't belong to this item.",
+            content = {@Content(examples = @ExampleObject(value = "Tag with ID: 'tagId' doesn't belong to this item!"), mediaType = "text/html")})
     @PatchMapping("/removeTag")
     public ResponseEntity<ItemRemoveTagResponse> removeTagFromItem(
             @Valid @RequestBody ItemRemoveTagRequest itemRemoveTagRequest
